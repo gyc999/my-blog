@@ -1,24 +1,3 @@
-﻿spring:
-  datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQLUSER}
-    password: ${MYSQLPASSWORD}
-
-  data:
-    redis:
-      host: ${REDISHOST}
-      port: ${REDISPORT}
-      password: ${REDISPASSWORD}
-
-  thymeleaf:
-    cache: false
-
-server:
-  port: ${PORT:8080}
-
-app:
-  jwt:
-    secret: myBlogSecretKey1234567890123456789012
-    expire: 86400000
-  upload:
-    path: uploads
+# Production profile — loaded on Railway
+# Database/Redis config is in application.yml via env vars
+# This file can be empty or contain prod-only overrides
