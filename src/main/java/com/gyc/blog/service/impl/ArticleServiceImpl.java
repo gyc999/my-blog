@@ -69,9 +69,10 @@ public class ArticleServiceImpl implements ArticleService {
         old.setTitle(article.getTitle());
         old.setContent(article.getContent());
         old.setSummary(article.getSummary());
+        old.setCoverImage(article.getCoverImage());
         old.setCategoryId(article.getCategoryId());
         old.setStatus(article.getStatus());
-        // updateTime 由数据库自动更新（@TableField 注解自动填充）
+        old.setUpdateTime(LocalDateTime.now());
         return articleMapper.updateById(old) > 0;
     }
 

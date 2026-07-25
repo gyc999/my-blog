@@ -52,7 +52,7 @@
             </header>
 
             <!-- Cover Image -->
-            <img v-if="article.coverImage" class="article-cover" :src="article.coverImage" :alt="article.title">
+            <img v-if="article.coverImage" class="article-cover" :src="article.coverImage" :alt="article.title" @error="e => { e.target.src='/img/default-bg.svg'; e.target.onerror=null; }">
 
             <!-- Content -->
             <div class="article-content" v-html="renderedContent"></div>
