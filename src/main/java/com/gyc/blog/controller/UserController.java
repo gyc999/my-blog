@@ -7,12 +7,15 @@ import com.gyc.blog.common.UserContext;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.entity.User;
 import com.gyc.blog.entity.vo.ArticleVO;
+import com.gyc.blog.mapper.UserMapper;
 import com.gyc.blog.service.ArticleService;
 import com.gyc.blog.service.LikeService;
 import com.gyc.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +32,9 @@ public class UserController {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @PostMapping("/register")
     public Result<String> register(@RequestBody User user) {
@@ -110,5 +116,15 @@ public class UserController {
         Page<ArticleVO> pageParam = new Page<>(page, size);
         IPage<ArticleVO> result = articleService.getArticleList(pageParam, null, null, null, userId);
         return Result.success(result);
+    }
+
+    // 健康检查 - 测试数据库连接
+    @GetMapping("/health")
+    public Result<String> health() {
+        try (Connection conn = dataSource.getConnection()) {
+            return Result.success("DB OK: " + conn.getMetaData().getURL());
+        } catch (Exception e) {
+            return Result.error("DB FAIL: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
     }
 }

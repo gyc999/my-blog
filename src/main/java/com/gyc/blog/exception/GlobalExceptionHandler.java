@@ -11,8 +11,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -46,10 +44,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
-        StringWriter sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
-        String trace = sw.toString();
-        log.error("Unhandled exception: {}", trace);
-        return Result.error(500, trace.substring(0, Math.min(trace.length(), 1500)));
+        log.error("Unhandled error", e);
+        // 找到根本原因
+        Throwable root = e;
+        while (root.getCause() != null && root.getCause() != root) {
+            root = root.getCause();
+        }
+        String msg = root.getClass().getSimpleName() + ": " + root.getMessage();
+        return Result.error(500, msg);
     }
 }
