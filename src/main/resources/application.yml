@@ -1,8 +1,6 @@
 spring:
   datasource:
-    url: ${MYSQL_PUBLIC_URL:jdbc:mysql://localhost:3306/blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
-    username: ${MYSQLUSER:root}
-    password: ${MYSQLPASSWORD:root}
+    url: jdbc:${MYSQL_URL:mysql://root:root@localhost:3306/blog}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
@@ -38,7 +36,7 @@ server:
 
 app:
   jwt:
-    secret: myBlogSecretKey1234567890123456789012
+    secret: ${JWT_SECRET:myBlogSecretKey1234567890123456789012}
     expire: 86400000
   upload:
     path: uploads
