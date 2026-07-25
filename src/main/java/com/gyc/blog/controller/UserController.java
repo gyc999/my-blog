@@ -118,17 +118,19 @@ public class UserController {
         return Result.success(result);
     }
 
-    // 健康检查 - 测试数据库连接
+    // 健康检查 - 列出所有数据库相关环境变量名
     @GetMapping("/health")
     public Result<String> health() {
-        System.out.println("=== Railway Env ===");
-        System.out.println("MYSQL_URL=" + System.getenv("MYSQL_URL"));
-        System.out.println("MYSQLHOST=" + System.getenv("MYSQLHOST"));
-        System.out.println("MYSQL_PUBLIC_URL=" + System.getenv("MYSQL_PUBLIC_URL"));
+        StringBuilder sb = new StringBuilder();
+        System.getenv().forEach((k, v) -> {
+            if (k.toUpperCase().contains("MYSQL") || k.toUpperCase().contains("REDIS") || k.equals("PORT")) {
+                sb.append(k).append(" | ");
+            }
+        });
         try (Connection conn = dataSource.getConnection()) {
-            return Result.success("DB OK");
+            return Result.success("ENV: " + sb + "| CONNECT: OK");
         } catch (Exception e) {
-            return Result.error("DB FAIL: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            return Result.success("ENV: " + sb + "| CONNECT FAIL: " + e.getClass().getSimpleName());
         }
     }
 }
