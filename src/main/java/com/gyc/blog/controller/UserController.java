@@ -121,8 +121,12 @@ public class UserController {
     // 健康检查 - 测试数据库连接
     @GetMapping("/health")
     public Result<String> health() {
+        System.out.println("=== Railway Env ===");
+        System.out.println("MYSQL_URL=" + System.getenv("MYSQL_URL"));
+        System.out.println("MYSQLHOST=" + System.getenv("MYSQLHOST"));
+        System.out.println("MYSQL_PUBLIC_URL=" + System.getenv("MYSQL_PUBLIC_URL"));
         try (Connection conn = dataSource.getConnection()) {
-            return Result.success("DB OK: " + conn.getMetaData().getURL());
+            return Result.success("DB OK");
         } catch (Exception e) {
             return Result.error("DB FAIL: " + e.getClass().getSimpleName() + " - " + e.getMessage());
         }
