@@ -45,6 +45,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
         e.printStackTrace();
-        return Result.error(500, "系统繁忙，请稍后再试");
+        return Result.error(500, e.getMessage() != null ? e.getMessage() : "系统繁忙，请稍后再试");
     }
 }

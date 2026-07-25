@@ -1,0 +1,125 @@
+### 1. 注册用户
+POST http://localhost:8080/api/user/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456",
+  "nickname": "管理员"
+}
+
+### 2. 登录（自动保存 Token 到 auth_token）
+POST http://localhost:8080/api/user/login?username=admin&password=123456
+
+> {%
+    client.global.set("auth_token", response.body.data);
+%}
+
+### 3. 发布文章（需要登录，请确保数据库 category 表有 id=1 的数据）
+POST http://localhost:8080/api/article/publish
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "MyBatis-Plus 分页查询实战",
+  "content": "本文介绍如何使用 MyBatis-Plus 实现多表关联分页查询...",
+  "summary": "分页查询是后端开发必备技能",
+  "categoryId": 1,
+  "status": 1
+}
+
+### 4. 查询文章列表（分页，默认第一页，每页10条）
+GET http://localhost:8080/api/article/list?page=1&size=10
+
+### 5. 按标题关键词搜索
+GET http://localhost:8080/api/article/list?page=1&size=5&keyword=分页
+
+### 6. 按分类筛选（categoryId=1）
+GET http://localhost:8080/api/article/list?page=1&size=5&categoryId=1
+
+### 7. 按状态筛选（status=1 已发布）
+GET http://localhost:8080/api/article/list?page=1&size=5&status=1
+
+### 8. 组合筛选（分类 + 关键词 + 状态）
+GET http://localhost:8080/api/article/list?page=1&size=5&categoryId=1&status=1&keyword=MyBatis
+
+### 9. 查询单篇文章（编辑回显）
+GET http://localhost:8080/api/article/1
+
+### 10. 编辑文章（需要登录，注意修改 id 和 title）
+PUT http://localhost:8080/api/article/1
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "【已修改】MyBatis-Plus 分页查询实战（完善版）",
+  "content": "这是修改后的内容，增加了更多细节...",
+  "summary": "修改后的摘要",
+  "categoryId": 1,
+  "status": 1
+}
+
+### 11. 删除文章（需要登录，谨慎操作！）
+DELETE http://localhost:8080/api/article/1
+Authorization: Bearer {{auth_token}}
+
+### 12. 发表顶级评论（需要登录）
+POST http://localhost:8080/api/comment/publish
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "content": "这篇文章写得很好，学习了！"
+}
+
+### 13. 回复某条评论（parentId 为评论ID，replyToUserId 为被回复者ID）
+POST http://localhost:8080/api/comment/publish
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "content": "感谢支持！欢迎继续交流。",
+  "parentId": 1,
+  "replyToUserId": 1
+}
+
+### 14. 查询文章的所有评论（按层级结构返回）
+GET http://localhost:8080/api/comment/list/1
+
+### 15. 删除评论（需要登录，只能删自己的）
+DELETE http://localhost:8080/api/comment/1
+Authorization: Bearer {{auth_token}}
+
+### 16. 点赞文章（需要登录）
+POST http://localhost:8080/api/like/toggle/1
+Authorization: Bearer {{auth_token}}
+
+### 17. 查看点赞状态
+GET http://localhost:8080/api/like/status/1
+Authorization: Bearer {{auth_token}}
+
+### 18. 查看点赞数
+GET http://localhost:8080/api/like/count/1
+
+### 19. 收藏文章
+POST http://localhost:8080/api/like/collect/toggle/1
+Authorization: Bearer {{auth_token}}
+
+### 20. 查看收藏状态
+GET http://localhost:8080/api/like/collect/status/1
+Authorization: Bearer {{auth_token}}
+
+### 21. 查看收藏数
+GET http://localhost:8080/api/like/collect/count/1
+
+### 22. 发表空内容评论（应触发 @NotBlank 校验，返回 400）
+POST http://localhost:8080/api/comment/publish
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "content": ""
+}
