@@ -12,6 +12,8 @@ import com.gyc.blog.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
@@ -24,6 +26,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public boolean publish(Article article, Long authorId) {
         article.setAuthorId(authorId);
+        article.setCreateTime(LocalDateTime.now());
+        article.setUpdateTime(LocalDateTime.now());
         if (article.getViewCount() == null) article.setViewCount(0);
         if (article.getLikeCount() == null) article.setLikeCount(0);
         if (article.getCollectCount() == null) article.setCollectCount(0);

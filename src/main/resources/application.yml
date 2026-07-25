@@ -1,7 +1,10 @@
 spring:
   datasource:
-    url: jdbc:${MYSQL_URL:mysql://root:root@localhost:3306/blog}?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=Asia/Shanghai
+    url: jdbc:${MYSQL_URL:mysql://root:root@localhost:3306/blog}?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=%2B08:00
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jackson:
+    time-zone: Asia/Shanghai
 
   data:
     redis:
