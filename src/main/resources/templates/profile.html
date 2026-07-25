@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 - 个人博客</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<div id="app">
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="navbar-brand">✨ 我的博客</a>
+        <ul class="navbar-nav">
+            <li><a href="/">首页</a></li>
+            <li v-if="isLoggedIn"><a href="/user/profile" style="color:var(--color-primary);font-weight:600">👤 个人主页</a></li>
+            <li v-if="!isLoggedIn"><a href="/login">登录</a></li>
+            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退出</button></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <!-- Loading -->
+    <div v-if="loading" style="padding:40px 0">
+        <div class="skeleton" style="height:36px;width:40%;margin-bottom:16px"></div>
+        <div class="skeleton skeleton-text" v-for="i in 3"></div>
+    </div>
+
+    <template v-if="!loading">
+        <h2 style="margin-bottom:24px">👤 个人主页</h2>
+
+        <!-- Profile Header Card -->
+        <div class="profile-header-card" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:32px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+            <div style="text-align:center;min-width:140px">
+                <img v-if="userInfo.avatar" :src="userInfo.avatar" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--border-color)">
+                <div v-else class="comment-avatar" style="width:100px;height:100px;font-size:2.2rem;margin:0 auto">👤</div>
+                <div style="font-size:1.2rem;font-weight:700;margin-top:10px">{{ userInfo.nickname || userInfo.username }}</div>
+                <div class="text-muted text-sm">@{{ userInfo.username }}</div>
+            </div>
+            <div style="flex:1;min-width:250px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div><label class="text-muted text-sm">昵称</label><div style="font-weight:500">{{ userInfo.nickname || '未设置' }}</div></div>
+                    <div><label class="text-muted text-sm">用户名</label><div style="font-weight:500">@{{ userInfo.username }}</div></div>
+                    <div><label class="text-muted text-sm">角色</label><div style="font-weight:500">{{ userInfo.role === 1 ? '管理员' : '普通用户' }}</div></div>
+                    <div><label class="text-muted text-sm">注册时间</label><div style="font-weight:500">{{ formatDate(userInfo.createTime) }}</div></div>
+                </div>
+                <button v-if="!editing" class="btn btn-outline" @click="startEdit" style="margin-top:20px">✏️ 编辑资料</button>
+                <!-- Edit Form -->
+                <div v-if="editing" style="margin-top:20px;padding:20px;background:var(--bg-hover);border-radius:var(--border-radius);border:1px solid var(--border-color)">
+                    <h4 style="margin-bottom:16px">编辑个人资料</h4>
+                    <div class="form-group">
+                        <label class="form-label">昵称</label>
+                        <input type="text" class="form-input" v-model="editForm.nickname" maxlength="20" placeholder="输入昵称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">头像URL</label>
+                        <input type="text" class="form-input" v-model="editForm.avatar" placeholder="输入头像图片链接">
+                    </div>
+                    <div v-if="editForm.avatar" style="margin-bottom:12px">
+                        <span class="text-muted text-sm">预览：</span>
+                        <img :src="editForm.avatar" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border-color);vertical-align:middle" @error="editForm.avatar=''">
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn btn-primary btn-sm" @click="saveProfile" :disabled="saving">{{ saving ? '保存中...' : '💾 保存' }}</button>
+                        <button class="btn btn-secondary btn-sm" @click="cancelEdit">取消</button>
+                    </div>
+                    <div v-if="editMsg" :style="{color: editSuccess ? 'var(--color-success)' : 'var(--color-error)', marginTop:'8px', fontSize:'0.9rem'}">{{ editMsg }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="profile-tabs" style="display:flex;gap:0;border-bottom:2px solid var(--border-color);margin-bottom:24px">
+            <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
+                :style="{
+                    padding:'12px 24px',border:'none',background:'none',
+                    cursor:'pointer',fontSize:'1rem',
+                    color: activeTab === tab.key ? 'var(--color-primary)' : 'var(--text-secondary)',
+                    borderBottom: activeTab === tab.key ? '2px solid var(--color-primary)' : '2px solid transparent',
+                    marginBottom:'-2px',fontWeight: activeTab === tab.key ? '600' : '400'
+                }">
+                {{ tab.label }}
+            </button>
+        </div>
+
+        <!-- Tab: Profile Info (managed via header card above, active tab just shows info) -->
+        <div v-if="activeTab === 'profile' && false"></div>
+
+        <!-- Tab: Liked Articles -->
+        <div v-if="activeTab === 'likes'">
+            <div v-if="likedLoading" style="padding:20px 0">
+                <div class="skeleton skeleton-text" v-for="i in 3"></div>
+            </div>
+            <div v-else-if="likedArticles.length === 0" class="empty-state">
+                <div class="empty-icon">💔</div>
+                <h3>还没有赞过的文章</h3>
+                <p class="text-muted">去首页发现感兴趣的文章吧</p>
+                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看看</a>
+            </div>
+            <div v-else class="card-grid">
+                <div class="card" v-for="a in likedArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
+                    <div class="card-img" style="height:180px;display:flex;align-items:center;justify-content:center">
+                        <img v-if="a.coverImage" :src="a.coverImage" :alt="a.title" style="width:100%;height:100%;object-fit:cover">
+                        <span v-else style="font-size:3rem">📄</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ a.title }}</h3>
+                        <p class="card-summary">{{ a.summary || '暂无摘要' }}</p>
+                        <div class="card-meta">
+                            <span>✍️ {{ a.authorName || '匿名' }}</span>
+                            <span>📅 {{ formatDate(a.createTime) }}</span>
+                            <span>❤️ {{ a.likeCount || 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Collected Articles -->
+        <div v-if="activeTab === 'collects'">
+            <div v-if="collectedLoading" style="padding:20px 0">
+                <div class="skeleton skeleton-text" v-for="i in 3"></div>
+            </div>
+            <div v-else-if="collectedArticles.length === 0" class="empty-state">
+                <div class="empty-icon">📑</div>
+                <h3>还没有收藏的文章</h3>
+                <p class="text-muted">遇到好文章记得收藏哦</p>
+                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看看</a>
+            </div>
+            <div v-else class="card-grid">
+                <div class="card" v-for="a in collectedArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
+                    <div class="card-img" style="height:180px;display:flex;align-items:center;justify-content:center">
+                        <img v-if="a.coverImage" :src="a.coverImage" :alt="a.title" style="width:100%;height:100%;object-fit:cover">
+                        <span v-else style="font-size:3rem">📄</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ a.title }}</h3>
+                        <p class="card-summary">{{ a.summary || '暂无摘要' }}</p>
+                        <div class="card-meta">
+                            <span>✍️ {{ a.authorName || '匿名' }}</span>
+                            <span>📅 {{ formatDate(a.createTime) }}</span>
+                            <span>⭐ {{ a.collectCount || 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: My Articles -->
+        <div v-if="activeTab === 'articles'">
+            <div v-if="myArticlesLoading" style="padding:20px 0">
+                <div class="skeleton skeleton-text" v-for="i in 3"></div>
+            </div>
+            <div v-else-if="myArticles.length === 0" class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>还没有发布文章</h3>
+                <p class="text-muted">开始写你的第一篇文章吧</p>
+                <a href="/article/publish" class="btn btn-primary btn-sm" style="margin-top:12px">✏️ 写文章</a>
+            </div>
+            <div v-else class="card-grid">
+                <div class="card" v-for="a in myArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
+                    <div class="card-img" style="height:180px;display:flex;align-items:center;justify-content:center">
+                        <img v-if="a.coverImage" :src="a.coverImage" :alt="a.title" style="width:100%;height:100%;object-fit:cover">
+                        <span v-else style="font-size:3rem">📄</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ a.title }}</h3>
+                        <p class="card-summary">{{ a.summary || '暂无摘要' }}</p>
+                        <div class="card-meta">
+                            <span>📅 {{ formatDate(a.createTime) }}</span>
+                            <span>👁️ {{ a.viewCount || 0 }}</span>
+                            <span>❤️ {{ a.likeCount || 0 }}</span>
+                            <span>💬 {{ a.commentCount || 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Not Logged In -->
+    <div v-if="!loading && !isLoggedIn" class="empty-state">
+        <div class="empty-icon">🔒</div>
+        <h3>请先登录</h3>
+        <p class="text-muted">登录后即可查看个人主页</p>
+        <a href="/login" class="btn btn-primary" style="margin-top:16px">去登录</a>
+    </div>
+</main>
+
+</div><!-- end #app -->
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, onMounted } = Vue;
+
+createApp({
+    setup() {
+        const isLoggedIn = ref(userState.isLoggedIn());
+        const userInfo = ref(userState.getUserInfo() || {});
+        const loading = ref(true);
+        const activeTab = ref('profile');
+        const editing = ref(false);
+        const saving = ref(false);
+        const editMsg = ref('');
+        const editSuccess = ref(false);
+        const editForm = ref({ nickname: '', avatar: '' });
+        const likedArticles = ref([]);
+        const collectedArticles = ref([]);
+        const myArticles = ref([]);
+        const likedLoading = ref(false);
+        const collectedLoading = ref(false);
+        const myArticlesLoading = ref(false);
+
+        const tabs = [
+            { key: 'profile', label: '📋 个人信息' },
+            { key: 'articles', label: '📝 我的文章' },
+            { key: 'likes', label: '❤️ 赞过的文章' },
+            { key: 'collects', label: '⭐ 收藏的文章' }
+        ];
+
+        const loadUserInfo = async () => {
+            try {
+                await userState.fetchAndCacheUserInfo();
+                userInfo.value = userState.getUserInfo() || {};
+            } catch {}
+        };
+
+        const startEdit = () => {
+            editForm.value.nickname = userInfo.value.nickname || '';
+            editForm.value.avatar = userInfo.value.avatar || '';
+            editMsg.value = '';
+            editing.value = true;
+        };
+
+        const cancelEdit = () => {
+            editing.value = false;
+            editMsg.value = '';
+        };
+
+        const saveProfile = async () => {
+            saving.value = true;
+            editMsg.value = '';
+            try {
+                const res = await api.put('/api/user/me', {
+                    nickname: editForm.value.nickname,
+                    avatar: editForm.value.avatar
+                });
+                if (res.code === 200) {
+                    editSuccess.value = true;
+                    editMsg.value = '更新成功！';
+                    await loadUserInfo();
+                    setTimeout(() => { editing.value = false; editMsg.value = ''; }, 1500);
+                } else {
+                    editSuccess.value = false;
+                    editMsg.value = res.msg || '更新失败';
+                }
+            } catch {
+                editSuccess.value = false;
+                editMsg.value = '网络错误';
+            } finally {
+                saving.value = false;
+            }
+        };
+
+        const loadLikedArticles = async () => {
+            likedLoading.value = true;
+            try {
+                const res = await api.get('/api/user/likes');
+                if (res.code === 200) likedArticles.value = res.data || [];
+            } catch {} finally {
+                likedLoading.value = false;
+            }
+        };
+
+        const loadCollectedArticles = async () => {
+            collectedLoading.value = true;
+            try {
+                const res = await api.get('/api/user/collects');
+                if (res.code === 200) collectedArticles.value = res.data || [];
+            } catch {} finally {
+                collectedLoading.value = false;
+            }
+        };
+
+        const loadMyArticles = async () => {
+            myArticlesLoading.value = true;
+            try {
+                const res = await api.get('/api/user/articles?size=50');
+                if (res.code === 200 && res.data) myArticles.value = res.data.records || [];
+            } catch {} finally {
+                myArticlesLoading.value = false;
+            }
+        };
+
+        const goDetail = (id) => {
+            window.location.href = '/article/detail/' + id;
+        };
+
+        const logout = () => userState.logout();
+
+        onMounted(async () => {
+            if (isLoggedIn.value) {
+                await loadUserInfo();
+            }
+            loading.value = false;
+            if (isLoggedIn.value) {
+                loadLikedArticles();
+                loadCollectedArticles();
+                loadMyArticles();
+            }
+        });
+
+        return {
+            isLoggedIn, userInfo, loading, activeTab, tabs,
+            editing, saving, editMsg, editSuccess, editForm,
+            likedArticles, collectedArticles, myArticles,
+            likedLoading, collectedLoading, myArticlesLoading,
+            startEdit, cancelEdit, saveProfile,
+            loadMyArticles,
+            goDetail, logout, formatDate
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyc.blog.mapper.ArticleMapper">
+
+    <resultMap id="ArticleVOMap" type="com.gyc.blog.entity.vo.ArticleVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="collect_count" property="collectCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="author_name" property="authorName"/>
+        <result column="category_name" property="categoryName"/>
+    </resultMap>
+
+    <select id="selectArticleListWithDetail" resultMap="ArticleVOMap">
+        SELECT
+        a.id,
+        a.title,
+        a.summary,
+        a.cover_image,
+        a.view_count,
+        a.like_count,
+        a.collect_count,
+        a.status,
+        a.create_time,
+        u.nickname AS author_name,
+        c.name AS category_name
+        FROM article a
+        LEFT JOIN user u ON a.author_id = u.id
+        LEFT JOIN category c ON a.category_id = c.id
+        WHERE 1=1
+        <if test="categoryId != null and categoryId != ''">
+            AND a.category_id = #{categoryId}
+        </if>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND a.title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="authorId != null">
+            AND a.author_id = #{authorId}
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+
+</mapper>

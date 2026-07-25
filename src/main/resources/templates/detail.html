@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">文章详情 - 个人博客</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<div id="app">
+<div class="reading-progress" style="width:0%"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <a href="/" class="navbar-brand">✨ 我的博客</a>
+        <ul class="navbar-nav">
+            <li><a href="/">首页</a></li>
+            <li v-if="isLoggedIn"><a href="/user/profile">👤 个人主页</a></li>
+            <li v-if="!isLoggedIn"><a href="/login">登录</a></li>
+            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退出</button></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="detail-layout container my-4">
+    <!-- Main Content -->
+    <div class="article-main">
+        <!-- Loading -->
+        <div v-if="loading" style="padding:40px 0">
+            <div class="skeleton" style="height:36px;width:70%;margin-bottom:16px"></div>
+            <div class="skeleton skeleton-text" style="margin-bottom:8px" v-for="i in 3"></div>
+            <div class="skeleton" style="height:300px;margin-top:24px"></div>
+        </div>
+
+        <!-- Article -->
+        <template v-if="!loading && article">
+            <!-- Header -->
+            <header class="article-header">
+                <h1>{{ article.title }}</h1>
+                <div class="article-header-meta">
+                    <span>✍️ {{ article.authorName || '匿名' }}</span>
+                    <span v-if="article.categoryId">📂 分类{{ article.categoryId }}</span>
+                    <span>📅 {{ formatDate(article.createTime) }}</span>
+                    <span>👁️ {{ viewCount }}</span>
+                    <span>❤️ {{ likeCount }}</span>
+                    <span>⭐ {{ collectCount }}</span>
+                </div>
+            </header>
+
+            <!-- Cover Image -->
+            <img v-if="article.coverImage" class="article-cover" :src="article.coverImage" :alt="article.title">
+
+            <!-- Content -->
+            <div class="article-content" v-html="renderedContent"></div>
+
+            <!-- Article Actions -->
+            <div style="display:flex;gap:12px;align-items:center;margin:40px 0;padding:20px;background:var(--bg-card);border-radius:var(--border-radius);border:1px solid var(--border-color)">
+                <button class="btn btn-ghost btn-like" :class="{liked: isLiked}" @click="toggleLike" :disabled="!isLoggedIn" style="font-size:1.1rem">
+                    <span v-if="isLiked">❤️</span><span v-else>🤍</span> {{ likeCount }}
+                </button>
+                <button class="btn btn-ghost btn-collect" :class="{collected: isCollected}" @click="toggleCollect" :disabled="!isLoggedIn" style="font-size:1.1rem">
+                    <span v-if="isCollected">⭐</span><span v-else>☆</span> {{ collectCount }}
+                </button>
+                <div style="flex:1"></div>
+                <a :href="'/article/edit/' + article.id" class="btn btn-outline btn-sm" v-if="isOwner">编辑</a>
+                <button class="btn btn-ghost btn-sm" v-if="isOwner" @click="deleteArticle" style="color:var(--color-error)">删除</button>
+            </div>
+
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <h3 style="margin-bottom:20px">💬 评论 ({{ comments.length }})</h3>
+
+                <!-- Publish Comment -->
+                <div v-if="isLoggedIn" style="margin-bottom:24px">
+                    <textarea class="form-input" v-model="newComment" rows="3" placeholder="写下你的想法..." :disabled="commentSubmitting"></textarea>
+                    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+                        <button class="btn btn-primary btn-sm" @click="publishComment(null)" :disabled="commentSubmitting || !newComment.trim()">
+                            {{ commentSubmitting ? '发表中...' : '发表评论' }}
+                        </button>
+                    </div>
+                </div>
+                <div v-else style="text-align:center;padding:20px;color:var(--text-muted)">
+                    <a href="/login">登录</a> 后参与评论
+                </div>
+
+                <!-- Comment List -->
+                <div v-if="comments.length > 0">
+                    <div class="comment" v-for="c in comments" :key="c.id" style="margin-bottom:0;border-bottom:none">
+                        <div class="comment-header">
+                            <div class="comment-avatar">{{ (c.userNickname || '用户')[0] }}</div>
+                            <span class="comment-author">{{ c.userNickname || '匿名' }}</span>
+                            <span class="comment-time">{{ formatDate(c.createTime) }}</span>
+                        </div>
+                        <div class="comment-body" v-html="escapeHtml(c.content)"></div>
+                        <div class="comment-actions">
+                            <button @click="replyTo = replyTo?.id === c.id ? null : c">回复</button>
+                            <button v-if="isOwner" @click="delComment(c.id)" style="color:var(--color-error)">删除</button>
+                        </div>
+                        <!-- Reply Form -->
+                        <div v-if="replyTo?.id === c.id" style="margin-top:8px;padding-left:16px;border-left:2px solid var(--color-primary)">
+                            <textarea class="form-input" v-model="replyContent" rows="2" :placeholder="'回复 ' + c.userNickname"></textarea>
+                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                <button class="btn btn-secondary btn-sm" @click="replyTo = null">取消</button>
+                                <button class="btn btn-primary btn-sm" @click="publishComment(c)" :disabled="!replyContent.trim()">回复</button>
+                            </div>
+                        </div>
+                        <!-- Nested Children -->
+                        <div v-if="c.children && c.children.length > 0" class="comment-children">
+                            <div class="comment" v-for="child in c.children" :key="child.id" style="margin-bottom:0;border-bottom:none">
+                                <div class="comment-header">
+                                    <div class="comment-avatar">{{ (child.userNickname || '用户')[0] }}</div>
+                                    <span class="comment-author">{{ child.userNickname || '匿名' }}</span>
+                                    <span v-if="child.replyToUserNickname" class="comment-reply-to">@{{ child.replyToUserNickname }}</span>
+                                    <span class="comment-time">{{ formatDate(child.createTime) }}</span>
+                                </div>
+                                <div class="comment-body">{{ child.content }}</div>
+                                <div class="comment-actions">
+                                    <button @click="replyTo = replyTo?.id === child.id ? null : child">回复</button>
+                                </div>
+                                <div v-if="replyTo?.id === child.id" style="margin-top:8px;padding-left:16px;border-left:2px solid var(--color-primary)">
+                                    <textarea class="form-input" v-model="replyContent" rows="2" :placeholder="'回复 ' + child.userNickname"></textarea>
+                                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                        <button class="btn btn-secondary btn-sm" @click="replyTo = null">取消</button>
+                                        <button class="btn btn-primary btn-sm" @click="publishComment(child)" :disabled="!replyContent.trim()">回复</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <!-- Not Found -->
+        <div class="empty-state" v-if="!loading && !article">
+            <div class="empty-icon">🔍</div>
+            <h3>文章不存在</h3>
+            <a href="/">返回首页</a>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" v-if="!loading && article">
+        <div class="sidebar-card">
+            <h3>关于作者</h3>
+            <div style="text-align:center">
+                <div class="comment-avatar" style="width:60px;height:60px;font-size:1.4rem;margin:0 auto 10px">👤</div>
+                <div style="font-weight:600;margin-bottom:4px">{{ article.authorName || '匿名' }}</div>
+                <div class="text-muted text-sm">{{ formatDate(article.createTime) }} 发布</div>
+            </div>
+        </div>
+
+        <div class="sidebar-card">
+            <h3>文章信息</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:0.9rem;color:var(--text-secondary)">
+                <span>👁️ 浏览 {{ viewCount }} 次</span>
+                <span>❤️ {{ likeCount }} 个赞</span>
+                <span>⭐ {{ collectCount }} 个收藏</span>
+                <span>💬 {{ comments.length }} 条评论</span>
+                <span>📅 {{ article?.createTime?.substring(0,10) }}</span>
+            </div>
+        </div>
+
+        <div class="sidebar-card">
+            <h3>操作</h3>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-outline btn-sm btn-block" :class="{liked: isLiked}" @click="toggleLike" :disabled="!isLoggedIn">
+                    {{ isLiked ? '❤️ 已点赞' : '🤍 点赞' }}
+                </button>
+                <button class="btn btn-outline btn-sm btn-block" :class="{collected: isCollected}" @click="toggleCollect" :disabled="!isLoggedIn">
+                    {{ isCollected ? '⭐ 已收藏' : '☆ 收藏' }}
+                </button>
+                <a href="/" class="btn btn-secondary btn-sm btn-block">← 返回首页</a>
+            </div>
+        </div>
+    </aside>
+</main>
+
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
+
+<script>
+window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    document.querySelector('.reading-progress').style.width = progress + '%';
+    document.getElementById('backToTop').classList.toggle('visible', scrollTop > 400);
+});
+</script>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+const articleId = window.location.pathname.split('/').pop();
+const { createApp, ref, watch, onMounted } = Vue;
+
+// Configure marked
+marked.setOptions({ breaks: true, gfm: true });
+marked.use({
+    renderer: {
+        code(code, lang) {
+            const valid = lang && hljs.getLanguage(lang);
+            const highlighted = valid ? hljs.highlight(code, { language: lang }).value : code;
+            const langLabel = lang ? `<span class="hljs-lang">${lang}</span>` : '';
+            return `<pre>${langLabel}<code class="hljs ${valid ? 'language-' + lang : ''}">${highlighted}</code></pre>`;
+        }
+    }
+});
+
+createApp({
+    setup() {
+        const article = ref(null);
+        const comments = ref([]);
+        const loading = ref(true);
+        const isLoggedIn = ref(userState.isLoggedIn());
+        const userInfo = ref(userState.getUserInfo());
+        const isOwner = ref(false);
+        const isLiked = ref(false);
+        const isCollected = ref(false);
+        const likeCount = ref(0);
+        const collectCount = ref(0);
+        const viewCount = ref(0);
+        const renderedContent = ref('');
+        const newComment = ref('');
+        const replyTo = ref(null);
+        const replyContent = ref('');
+        const commentSubmitting = ref(false);
+
+        const loadArticle = async () => {
+            try {
+                const res = await api.get(`/api/article/${articleId}`);
+                if (res.code === 200 && res.data) {
+                    article.value = res.data;
+                    document.getElementById('pageTitle').textContent = article.value.title + ' - 个人博客';
+                    renderedContent.value = marked.parse(article.value.content || '');
+                    setTimeout(() => hljs.highlightAll(), 100);
+                    likeCount.value = article.value.likeCount || 0;
+                    collectCount.value = article.value.collectCount || 0;
+                    viewCount.value = (article.value.viewCount || 0) + 1;
+                    // Increment view count
+                    api.put(`/api/article/${articleId}/view`).catch(() => {});
+                    // Check owner
+                    if (userInfo.value) {
+                        isOwner.value = String(userInfo.value.id) === String(article.value.authorId);
+                    }
+                }
+            } catch {} finally {
+                loading.value = false;
+            }
+        };
+
+        const loadComments = async () => {
+            try {
+                const res = await api.get(`/api/comment/list/${articleId}`);
+                if (res.code === 200) comments.value = res.data || [];
+            } catch {}
+        };
+
+        const loadLikeStatus = async () => {
+            if (!isLoggedIn.value) return;
+            try {
+                const [lr, cr] = await Promise.all([
+                    api.get(`/api/like/status/${articleId}`),
+                    api.get(`/api/like/collect/status/${articleId}`)
+                ]);
+                if (lr.code === 200) isLiked.value = !!lr.data;
+                if (cr.code === 200) isCollected.value = !!cr.data;
+            } catch {}
+        };
+
+        const toggleLike = async () => {
+            if (!isLoggedIn.value) { showToast('请先登录', 'warning'); return; }
+            const res = await api.post(`/api/like/toggle/${articleId}`);
+            if (res.code === 200) {
+                isLiked.value = !!res.data;
+                likeCount.value += res.data ? 1 : -1;
+            }
+        };
+
+        const toggleCollect = async () => {
+            if (!isLoggedIn.value) { showToast('请先登录', 'warning'); return; }
+            const res = await api.post(`/api/like/collect/toggle/${articleId}`);
+            if (res.code === 200) {
+                isCollected.value = !!res.data;
+                collectCount.value += res.data ? 1 : -1;
+            }
+        };
+
+        const publishComment = async (parent) => {
+            if (!isLoggedIn.value) { showToast('请先登录', 'warning'); return; }
+            const content = parent ? replyContent.value.trim() : newComment.value.trim();
+            if (!content) return;
+            commentSubmitting.value = true;
+            try {
+                const body = { articleId: parseInt(articleId), content };
+                if (parent) {
+                    body.parentId = parent.id;
+                    body.replyToUserId = parent.userId;
+                }
+                const res = await api.post('/api/comment/publish', body);
+                if (res.code === 200) {
+                    showToast('评论成功', 'success');
+                    if (parent) { replyContent.value = ''; replyTo.value = null; }
+                    else newComment.value = '';
+                    loadComments();
+                } else {
+                    showToast(res.msg || '评论失败', 'error');
+                }
+            } catch { showToast('网络错误', 'error'); }
+            finally { commentSubmitting.value = false; }
+        };
+
+        const delComment = async (commentId) => {
+            if (!confirm('确定删除这条评论吗？子评论也会被删除。')) return;
+            try {
+                const res = await api.delete(`/api/comment/${commentId}`);
+                if (res.code === 200) {
+                    showToast('删除成功', 'success');
+                    loadComments();
+                } else {
+                    showToast(res.msg || '删除失败', 'error');
+                }
+            } catch { showToast('网络错误', 'error'); }
+        };
+
+        const deleteArticle = async () => {
+            if (!confirm('确定删除这篇文章吗？此操作不可撤销。')) return;
+            try {
+                const res = await api.delete(`/api/article/${articleId}`);
+                if (res.code === 200) {
+                    showToast('删除成功', 'success');
+                    setTimeout(() => { window.location.href = '/'; }, 800);
+                } else {
+                    showToast(res.msg || '删除失败', 'error');
+                }
+            } catch { showToast('网络错误', 'error'); }
+        };
+
+        const logout = () => userState.logout();
+
+        onMounted(() => {
+            loadArticle();
+            loadComments();
+            loadLikeStatus();
+        });
+
+        return {
+            article, comments, loading, isLoggedIn, isOwner, isLiked, isCollected,
+            likeCount, collectCount, viewCount, renderedContent, newComment,
+            replyTo, replyContent, commentSubmitting,
+            toggleLike, toggleCollect, publishComment, delComment, deleteArticle, logout,
+            formatDate, escapeHtml
+        };
+    }
+}).mount('#app');
+</script>
+</div><!-- end #app -->
+</body>
+</html>
