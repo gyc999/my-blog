@@ -1,17 +1,6 @@
-spring:
+﻿spring:
   profiles:
     active: dev
-  datasource:
-    url: jdbc:mysql://localhost:3306/blog?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 0
 
   servlet:
     multipart:
@@ -38,7 +27,6 @@ mybatis-plus:
 server:
   port: 8080
 
-# 应用自定义配置
 app:
   jwt:
     secret: myBlogSecretKey1234567890123456789012
