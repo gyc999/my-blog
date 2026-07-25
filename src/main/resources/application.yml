@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:${MYSQL_URL:mysql://root:root@localhost:3306/blog}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:${MYSQL_URL:mysql://root:root@localhost:3306/blog}?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
