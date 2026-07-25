@@ -34,9 +34,9 @@ public class UploadController {
             return Result.error("只允许上传图片文件");
         }
         try {
-            // 按日期创建子目录
+            // 按日期创建子目录（使用绝对路径，避免相对路径在不同环境下的不确定性）
             String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-            Path uploadPath = Paths.get(uploadDir, dateDir);
+            Path uploadPath = Paths.get(uploadDir, dateDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
 
             // 生成唯一文件名

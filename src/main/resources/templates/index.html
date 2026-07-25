@@ -64,7 +64,7 @@
     <!-- Article Card Grid -->
     <div class="card-grid" v-if="!loading && articles.length > 0">
         <article class="card" v-for="a in articles" :key="a.id">
-            <img class="card-img" :src="a.coverImage || '/img/default-bg.svg'" :alt="a.title" @error="e => { e.target.src='/img/default-bg.svg'; e.target.onerror=null; }">
+            <img class="card-img" :src="a.coverImage || '/img/default-bg.svg'" :alt="a.title" @error="onImgError">
             <div class="card-body">
                 <h2 class="card-title">
                     <a :href="'/article/detail/' + a.id">{{ a.title }}</a>
@@ -284,6 +284,10 @@ createApp({
 
         const logout = () => userState.logout();
 
+        const onImgError = (e) => {
+            e.target.src = '/img/default-bg.svg';
+        };
+
         onMounted(async () => {
             loadCategories();
             loadTags();
@@ -303,7 +307,7 @@ createApp({
             keyword, categoryId, activeTag, likedSet, collectedSet,
             isLoggedIn, userInfo, pages, parseTags,
             search, reset, filterByTag, goTo, toggleLike, toggleCollect, logout,
-            formatDate
+            formatDate, onImgError
         };
     }
 }).mount('#app');

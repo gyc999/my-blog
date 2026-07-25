@@ -52,7 +52,7 @@
             </header>
 
             <!-- Cover Image -->
-            <img v-if="article.coverImage" class="article-cover" :src="article.coverImage" :alt="article.title" @error="e => { e.target.src='/img/default-bg.svg'; e.target.onerror=null; }">
+            <img v-if="article.coverImage" class="article-cover" :src="article.coverImage" :alt="article.title" @error="onImgError">
 
             <!-- Content -->
             <div class="article-content" v-html="renderedContent"></div>
@@ -343,6 +343,10 @@ createApp({
 
         const logout = () => userState.logout();
 
+        const onImgError = (e) => {
+            e.target.src = '/img/default-bg.svg';
+        };
+
         onMounted(() => {
             loadArticle();
             loadComments();
@@ -354,7 +358,7 @@ createApp({
             likeCount, collectCount, viewCount, renderedContent, newComment,
             replyTo, replyContent, commentSubmitting,
             toggleLike, toggleCollect, publishComment, delComment, deleteArticle, logout,
-            formatDate, escapeHtml
+            formatDate, escapeHtml, onImgError
         };
     }
 }).mount('#app');

@@ -189,8 +189,8 @@ createApp({
                 });
                 const data = await res.json();
                 if (data.code === 200) return data.data.url;
-            } catch {}
-            return null;
+                else { showToast('封面上传失败: ' + (data.msg || '未知错误'), 'error'); return null; }
+            } catch (e) { showToast('封面上传失败，请检查网络', 'error'); return null; }
         };
 
         const updatePreview = () => {
