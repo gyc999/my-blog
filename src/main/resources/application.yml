@@ -1,10 +1,6 @@
-# ===== Railway 生产 / 本地开发 共用 =====
-# Railway 自动注入 MYSQL_URL, MYSQLUSER, MYSQLPASSWORD 等环境变量
-# 本地没有这些变量时，使用冒号后面的默认值
-
 spring:
   datasource:
-    url: ${MYSQL_PUBLIC_URL:jdbc:mysql://localhost:3306/blog?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&allowPublicKeyRetrieval=true}
+    url: jdbc:mysql://${MYSQLHOST:localhost}:${MYSQLPORT:3306}/${MYSQLDATABASE:railway}?allowPublicKeyRetrieval=true&useSSL=true&requireSSL=true&serverTimezone=Asia/Shanghai
     username: ${MYSQLUSER:root}
     password: ${MYSQLPASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
