@@ -1,3 +1,0 @@
-# Production profile — loaded on Railway
-# Database/Redis config is in application.yml via env vars
-# This file can be empty or contain prod-only overrides
