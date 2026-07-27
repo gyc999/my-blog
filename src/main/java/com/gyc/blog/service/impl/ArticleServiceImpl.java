@@ -8,6 +8,7 @@ import com.gyc.blog.entity.User;
 import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.mapper.ArticleMapper;
 import com.gyc.blog.mapper.UserMapper;
+import com.gyc.blog.service.AiService;
 import com.gyc.blog.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private AiService aiService;
+
     @Override
     public boolean publish(Article article, Long authorId) {
         article.setAuthorId(authorId);
@@ -32,6 +36,15 @@ public class ArticleServiceImpl implements ArticleService {
         if (article.getLikeCount() == null) article.setLikeCount(0);
         if (article.getCollectCount() == null) article.setCollectCount(0);
         if (article.getStatus() == null) article.setStatus(1);
+
+        // 未填写摘要时，调用 AI 自动生成
+        if (article.getSummary() == null || article.getSummary().isBlank()) {
+            String aiSummary = aiService.generateSummary(article.getContent());
+            if (aiSummary != null && !aiSummary.isBlank()) {
+                article.setSummary(aiSummary);
+            }
+        }
+
         return articleMapper.insert(article) > 0;
     }
 

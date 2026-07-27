@@ -6,6 +6,7 @@ import com.gyc.blog.entity.User;
 import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.mapper.ArticleMapper;
 import com.gyc.blog.mapper.UserMapper;
+import com.gyc.blog.service.AiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ class ArticleServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private AiService aiService;
 
     @InjectMocks
     private ArticleServiceImpl articleService;

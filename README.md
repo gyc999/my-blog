@@ -180,6 +180,18 @@ src/main/resources/
 ### 4. 评论递归树
 评论平铺存储（`parent_id` 关联），读取时递归组装为树结构 + `hasChildren` 标志，既保留 SQL 查询效率又方便前端渲染。
 
+### 5. AI 摘要自动生成
+发布文章时不填写摘要，后端自动调用 Claude / OpenAI API 生成 150 字中文摘要。API 调用失败时静默降级（不影响发布）。支持通过环境变量切换模型和 Provider。
+
+```bash
+# 启用 AI 摘要（本地开发设置环境变量）
+set AI_API_KEY=sk-ant-xxx        # Windows
+export AI_API_KEY=sk-ant-xxx     # Mac/Linux
+# 可选：切换模型
+set AI_MODEL=claude-opus-4-8
+set AI_PROVIDER=openai            # 默认 anthropic
+```
+
 ## 📡 API 文档
 
 启动后访问 `http://localhost:8080/swagger-ui/index.html` 查看完整 Swagger API 文档。
