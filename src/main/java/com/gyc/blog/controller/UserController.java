@@ -6,11 +6,14 @@ import com.gyc.blog.common.Result;
 import com.gyc.blog.common.UserContext;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.entity.User;
+import com.gyc.blog.entity.dto.RegisterRequest;
+import com.gyc.blog.entity.dto.UpdateProfileRequest;
 import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.mapper.UserMapper;
 import com.gyc.blog.service.ArticleService;
 import com.gyc.blog.service.LikeService;
 import com.gyc.blog.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +40,11 @@ public class UserController {
     private DataSource dataSource;
 
     @PostMapping("/register")
-    public Result<String> register(@RequestBody User user) {
+    public Result<String> register(@Valid @RequestBody RegisterRequest req) {
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(req.getPassword());
+        user.setNickname(req.getNickname());
         boolean success = userService.register(user);
         if (success) {
             return Result.success("注册成功");
@@ -66,10 +73,13 @@ public class UserController {
 
     // 更新当前用户信息（昵称、头像）
     @PutMapping("/me")
-    public Result<String> updateProfile(@RequestBody User user) {
+    public Result<String> updateProfile(@Valid @RequestBody UpdateProfileRequest req) {
         Long userId = UserContext.getUserId();
         if (userId == null) return Result.error("请先登录");
+        User user = new User();
         user.setId(userId);
+        user.setNickname(req.getNickname());
+        user.setAvatar(req.getAvatar());
         return userService.updateProfile(user) ?
                 Result.success("更新成功") : Result.error("更新失败");
     }

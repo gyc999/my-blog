@@ -8,6 +8,7 @@ import com.gyc.blog.entity.Article;
 import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.service.ArticleService;
 import com.gyc.blog.service.LikeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class ArticleController {
 
     // 1. 发布
     @PostMapping("/publish")
-    public Result<String> publish(@RequestBody Article article) {
+    public Result<String> publish(@Valid @RequestBody Article article) {
         Long authorId = UserContext.getUserId();
         if (authorId == null) {
             return Result.error("请先登录");
@@ -65,7 +66,7 @@ public class ArticleController {
 
     // ===== 新增：4. 编辑文章 =====
     @PutMapping("/{id}")
-    public Result<String> update(@PathVariable Long id, @RequestBody Article article) {
+    public Result<String> update(@PathVariable Long id, @Valid @RequestBody Article article) {
         // 确保路径上的 id 和 body 中的 id 一致（防止篡改）
         article.setId(id);
         Long currentUserId = UserContext.getUserId();
