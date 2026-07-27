@@ -272,7 +272,8 @@ createApp({
             try {
                 const res = await api.get('/api/user/likes');
                 if (res.code === 200) likedArticles.value = res.data || [];
-            } catch {} finally {
+                else showToast('加载赞过文章失败: ' + (res.msg || ''), 'error');
+            } catch { showToast('网络错误，加载赞过文章失败', 'error'); } finally {
                 likedLoading.value = false;
             }
         };
@@ -282,7 +283,8 @@ createApp({
             try {
                 const res = await api.get('/api/user/collects');
                 if (res.code === 200) collectedArticles.value = res.data || [];
-            } catch {} finally {
+                else showToast('加载收藏文章失败: ' + (res.msg || ''), 'error');
+            } catch { showToast('网络错误，加载收藏文章失败', 'error'); } finally {
                 collectedLoading.value = false;
             }
         };
@@ -292,7 +294,8 @@ createApp({
             try {
                 const res = await api.get('/api/user/articles?size=50');
                 if (res.code === 200 && res.data) myArticles.value = res.data.records || [];
-            } catch {} finally {
+                else showToast('加载我的文章失败: ' + (res.msg || ''), 'error');
+            } catch { showToast('网络错误，加载我的文章失败', 'error'); } finally {
                 myArticlesLoading.value = false;
             }
         };

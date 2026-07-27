@@ -43,6 +43,10 @@
         <if test="status != null">
             AND a.status = #{status}
         </if>
+        <!-- 动态条件：作者筛选 -->
+        <if test="authorId != null">
+            AND a.author_id = #{authorId}
+        </if>
         <!-- 动态条件：标题关键词搜索 -->
         <if test="keyword != null and keyword != ''">
             AND a.title LIKE CONCAT('%', #{keyword}, '%')
