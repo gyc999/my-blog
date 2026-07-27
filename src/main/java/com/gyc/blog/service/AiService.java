@@ -77,6 +77,11 @@ public class AiService {
             long elapsed = System.currentTimeMillis() - start;
 
             if (summary != null && !summary.isBlank()) {
+                // 安全检查：如果摘要和原文几乎一样（模型偷懒），丢弃
+                if (isTooSimilar(summary, plainText)) {
+                    log.warn("AI 摘要与原文过于相似，丢弃 | {}ms", elapsed);
+                    return "";
+                }
                 // 截断到最大字数
                 if (summary.length() > maxSummaryChars + 20) {
                     summary = summary.substring(0, maxSummaryChars + 20);
@@ -94,7 +99,7 @@ public class AiService {
 
     private String buildPrompt(String text) {
         return String.format(
-                "你是一个博客摘要助手。请用中文将以下文章内容总结为一段不超过%d字的摘要，直接输出摘要内容，不要加任何前缀或说明。\n\n文章内容：\n%s",
+                "请将以下博客文章总结为一句话摘要，不超过%d个字，直接给出摘要内容，不要重复原文，不要加\"这篇文章\"\"本文\"等前缀。\n\n%s",
                 maxSummaryChars, text
         );
     }
@@ -105,7 +110,6 @@ public class AiService {
         Map<String, Object> body = Map.of(
                 "model", model,
                 "max_tokens", maxSummaryChars + 50,
-                "system", "你是一个专业的博客摘要生成助手。请简洁准确地总结文章核心内容。",
                 "messages", List.of(
                         Map.of("role", "user", "content", prompt)
                 )
@@ -136,7 +140,6 @@ public class AiService {
                 "model", model,
                 "max_tokens", maxSummaryChars + 50,
                 "messages", List.of(
-                        Map.of("role", "system", "content", "你是一个专业的博客摘要生成助手。请简洁准确地总结文章核心内容。"),
                         Map.of("role", "user", "content", prompt)
                 )
         );
@@ -159,5 +162,21 @@ public class AiService {
             }
         }
         return "";
+    }
+
+    /**
+     * 检查 AI 返回的摘要是否和原文过于相似（说明模型在偷懒）
+     * 用简单的子串匹配：如果摘要全部出现在原文中，或者原文以摘要开头，判定为偷懒
+     */
+    private boolean isTooSimilar(String summary, String original) {
+        String s = summary.replaceAll("\\s+", "").trim();
+        String o = original.replaceAll("\\s+", "").trim();
+        // 摘要太短没意义
+        if (s.length() < 5) return true;
+        // 摘要全部包含在原文中 → 模型直接复制了
+        if (o.contains(s)) return true;
+        // 摘要和原文开头一样 → 模型没做总结
+        if (s.length() > 20 && o.startsWith(s.substring(0, Math.min(20, s.length())))) return true;
+        return false;
     }
 }
