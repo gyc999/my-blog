@@ -3,10 +3,13 @@ package com.gyc.blog.common;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 public class JwtInterceptor implements HandlerInterceptor {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
     private final JwtUtil jwtUtil;
 
     public JwtInterceptor(JwtUtil jwtUtil) {
@@ -28,8 +31,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             Claims claims = jwtUtil.parseToken(token);
             Long userId = claims.get("userId", Long.class);
             UserContext.setUserId(userId);
-        } catch (Exception ignored) {
-            // token 无效或过期，静默忽略
+        } catch (Exception e) {
+            log.debug("Token 解析失败: {}", e.getMessage());
         }
         return true;
     }

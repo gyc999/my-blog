@@ -3,8 +3,6 @@ package com.gyc.blog.service.impl;
 import com.gyc.blog.common.RedisUtil;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.mapper.ArticleMapper;
-import com.gyc.blog.service.LikeService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

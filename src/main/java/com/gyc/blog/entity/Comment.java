@@ -1,6 +1,9 @@
 package com.gyc.blog.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +28,6 @@ public class Comment {
     private Long parentId;
     private Long replyToUserId;
 
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     @TableLogic

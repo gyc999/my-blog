@@ -127,19 +127,12 @@ public class UserController {
         return Result.success(result);
     }
 
-    // 健康检查 - 列出所有数据库相关环境变量名
     @GetMapping("/health")
     public Result<String> health() {
-        StringBuilder sb = new StringBuilder();
-        System.getenv().forEach((k, v) -> {
-            if (k.toUpperCase().contains("MYSQL") || k.toUpperCase().contains("REDIS") || k.equals("PORT")) {
-                sb.append(k).append(" | ");
-            }
-        });
         try (Connection conn = dataSource.getConnection()) {
-            return Result.success("ENV: " + sb + "| CONNECT: OK");
+            return Result.success("OK");
         } catch (Exception e) {
-            return Result.success("ENV: " + sb + "| CONNECT FAIL: " + e.getClass().getSimpleName());
+            return Result.error("DB connection failed");
         }
     }
 }

@@ -145,15 +145,6 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// ---------- 防抖 ----------
-function debounce(fn, delay = 300) {
-  let timer;
-  return function(...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
-}
-
 // ---------- 页面初始化检查 ----------
 document.addEventListener('DOMContentLoaded', () => {
   const currentPath = window.location.pathname;
@@ -172,4 +163,3 @@ window.showToast = showToast;
 window.userState = userState;
 window.formatDate = formatDate;
 window.escapeHtml = escapeHtml;
-window.debounce = debounce;

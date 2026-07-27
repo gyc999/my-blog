@@ -1,6 +1,5 @@
 package com.gyc.blog.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gyc.blog.entity.Article;
@@ -110,10 +109,6 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void incrementViewCount(Long id) {
-        Article article = articleMapper.selectById(id);
-        if (article != null) {
-            article.setViewCount((article.getViewCount() == null ? 0 : article.getViewCount()) + 1);
-            articleMapper.updateById(article);
-        }
+        articleMapper.incrementViewCount(id);
     }
 }

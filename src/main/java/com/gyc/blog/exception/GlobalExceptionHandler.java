@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
         while (root.getCause() != null && root.getCause() != root) {
             root = root.getCause();
         }
-        String msg = root.getClass().getSimpleName() + ": " + root.getMessage();
+        String msg = root.getClass().getSimpleName() + ": " + (root.getMessage() != null ? root.getMessage() : "");
         return Result.error(500, msg);
     }
 }

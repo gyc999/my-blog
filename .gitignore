@@ -3,3 +3,8 @@ target/
 *.iml
 uploads/
 *.log
+.DS_Store
+*.swp
+*.swo
+.env
+.env.local

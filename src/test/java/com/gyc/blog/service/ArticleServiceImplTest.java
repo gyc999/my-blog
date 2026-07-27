@@ -1,9 +1,7 @@
 package com.gyc.blog.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.entity.User;
-import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.mapper.ArticleMapper;
 import com.gyc.blog.mapper.UserMapper;
 import com.gyc.blog.service.AiService;

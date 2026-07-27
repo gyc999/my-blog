@@ -4,6 +4,8 @@ import com.gyc.blog.common.RedisUtil;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.mapper.ArticleMapper;
 import com.gyc.blog.service.LikeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.util.Set;
 
 @Service
 public class LikeServiceImpl implements LikeService {
+
+    private static final Logger log = LoggerFactory.getLogger(LikeServiceImpl.class);
 
     private static final String LIKE_KEY_PREFIX = "article:like:";
     private static final String COLLECT_KEY_PREFIX = "article:collect:";
@@ -49,7 +53,8 @@ public class LikeServiceImpl implements LikeService {
                 return true;
             }
         } catch (Exception e) {
-            return false; // Redis 不可用，静默降级
+            log.warn("Redis 不可用，点赞降级: {}", e.getMessage());
+            return false;
         }
     }
 
@@ -59,6 +64,7 @@ public class LikeServiceImpl implements LikeService {
             String key = LIKE_KEY_PREFIX + articleId;
             return Boolean.TRUE.equals(redisUtil.sIsMember(key, String.valueOf(userId)));
         } catch (Exception e) {
+            log.warn("Redis 不可用，查询点赞状态降级: {}", e.getMessage());
             return false;
         }
     }
@@ -68,8 +74,9 @@ public class LikeServiceImpl implements LikeService {
         try {
             Object count = redisUtil.getHash(LIKE_COUNT_KEY, String.valueOf(articleId));
             if (count != null) return Long.parseLong(count.toString());
-        } catch (Exception ignored) {}
-        // Redis 不可用时直接从 DB 读取
+        } catch (Exception e) {
+            log.warn("Redis 不可用，降级读 DB 点赞数: {}", e.getMessage());
+        }
         Article article = articleMapper.selectById(articleId);
         if (article != null) {
             return article.getLikeCount() != null ? article.getLikeCount().longValue() : 0L;
@@ -98,6 +105,7 @@ public class LikeServiceImpl implements LikeService {
                 return true;
             }
         } catch (Exception e) {
+            log.warn("Redis 不可用，收藏降级: {}", e.getMessage());
             return false;
         }
     }
@@ -108,6 +116,7 @@ public class LikeServiceImpl implements LikeService {
             String key = COLLECT_KEY_PREFIX + articleId;
             return Boolean.TRUE.equals(redisUtil.sIsMember(key, String.valueOf(userId)));
         } catch (Exception e) {
+            log.warn("Redis 不可用，查询收藏状态降级: {}", e.getMessage());
             return false;
         }
     }
@@ -117,8 +126,9 @@ public class LikeServiceImpl implements LikeService {
         try {
             Object count = redisUtil.getHash(COLLECT_COUNT_KEY, String.valueOf(articleId));
             if (count != null) return Long.parseLong(count.toString());
-        } catch (Exception ignored) {}
-        // Redis 不可用时直接从 DB 读取
+        } catch (Exception e) {
+            log.warn("Redis 不可用，降级读 DB 收藏数: {}", e.getMessage());
+        }
         Article article = articleMapper.selectById(articleId);
         if (article != null) {
             return article.getCollectCount() != null ? article.getCollectCount().longValue() : 0L;
@@ -155,7 +165,7 @@ public class LikeServiceImpl implements LikeService {
                 }
             }
         } catch (Exception e) {
-            // Redis 不可用时静默跳过同步，不影响主业务
+            log.warn("Redis 不可用，跳过同步: {}", e.getMessage());
         }
     }
 

@@ -1,11 +1,11 @@
 package com.gyc.blog.controller;
 
 import com.gyc.blog.common.Result;
+import com.gyc.blog.common.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +25,7 @@ public class UploadController {
 
     @PostMapping("/image")
     public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        if (UserContext.getUserId() == null) return Result.error("请先登录");
         if (file.isEmpty()) {
             return Result.error("文件为空");
         }
