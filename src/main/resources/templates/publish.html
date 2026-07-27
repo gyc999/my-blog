@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>发布文章 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="/js/common.js"></script>
 </head>
@@ -12,23 +12,23 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
+        <a href="/" class="navbar-brand">�?郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li><a href="/user/profile">👤 个人主页</a></li>
-            <li><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
-            <li><button class="btn btn-ghost btn-sm" onclick="userState.logout()">退出</button></li>
+            <li><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文�?/a></li>
+            <li><button class="btn btn-ghost btn-sm" onclick="userState.logout()">退�?/button></li>
         </ul>
     </div>
 </nav>
 
 <main class="container my-4" id="app">
-    <h2 style="margin-bottom:24px">✏️ 发布新文章</h2>
+    <h2 style="margin-bottom:24px">✏️ 发布新文�?/h2>
 
     <form @submit.prevent="submitArticle">
         <!-- Cover Upload -->
         <div class="form-group">
-            <label class="form-label">封面图片 <span class="text-muted">(可选)</span></label>
+            <label class="form-label">封面图片 <span class="text-muted">(可�?</span></label>
             <div class="upload-area" @click="$refs.fileInput.click()" @dragover.prevent @drop.prevent="handleDrop" :class="{'drag-over': dragOver}" @dragenter="dragOver=true" @dragleave="dragOver=false">
                 <div v-if="!coverPreview && !coverUrl">
                     <div class="upload-icon">📷</div>
@@ -48,8 +48,8 @@
 
         <!-- Summary -->
         <div class="form-group">
-            <label class="form-label" for="summary">摘要 <span class="text-muted">(可选)</span></label>
-            <input type="text" id="summary" class="form-input" v-model="form.summary" placeholder="简要描述文章内容...">
+            <label class="form-label" for="summary">摘要 <span class="text-muted">(可�?</span></label>
+            <input type="text" id="summary" class="form-input" v-model="form.summary" placeholder="简要描述文章内�?..">
         </div>
 
         <!-- Category & Status -->
@@ -62,10 +62,10 @@
                 </select>
             </div>
             <div class="form-group" style="flex:1;min-width:200px">
-                <label class="form-label" for="status">状态</label>
+                <label class="form-label" for="status">状�?/label>
                 <select id="status" class="form-input" v-model="form.status">
                     <option :value="1">📢 发布</option>
-                    <option :value="0">📝 保存为草稿</option>
+                    <option :value="0">📝 保存为草�?/option>
                 </select>
             </div>
         </div>
@@ -73,7 +73,7 @@
         <!-- Tags -->
         <div class="form-group">
             <label class="form-label">标签 <span class="text-muted">(逗号分隔)</span></label>
-            <input type="text" class="form-input" v-model="form.tags" placeholder="例如: Java, Spring Boot, 后端开发">
+            <input type="text" class="form-input" v-model="form.tags" placeholder="例如: Java, Spring Boot, 后端开�?>
         </div>
 
         <!-- Editor -->
@@ -94,7 +94,7 @@
         <div v-if="errorMsg" class="mb-2" style="color:var(--color-error);font-size:0.9rem">{{ errorMsg }}</div>
         <div style="display:flex;gap:12px">
             <button type="submit" class="btn btn-primary btn-lg" :disabled="submitting">
-                {{ submitting ? '发布中...' : '🚀 发布文章' }}
+                {{ submitting ? '发布�?..' : '🚀 发布文章' }}
             </button>
             <a href="/" class="btn btn-secondary btn-lg">取消</a>
         </div>
@@ -102,7 +102,7 @@
 </main>
 
 <footer class="footer">
-    <div>✨ 郭源潮的个人博客</div>
+    <div>�?郭源潮的个人博客</div>
     <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
 </footer>
 
@@ -165,20 +165,20 @@ createApp({
                 const data = await res.json();
                 if (data.code === 200) return data.data.url;
                 else { showToast('封面上传失败: ' + (data.msg || '未知错误'), 'error'); return null; }
-            } catch (e) { showToast('封面上传失败，请检查网络', 'error'); return null; }
+            } catch (e) { showToast('封面上传失败，请检查网�?, 'error'); return null; }
         };
 
         const updatePreview = () => {
             if (form.value.content) {
                 previewHtml.value = marked.parse(form.value.content);
             } else {
-                previewHtml.value = '<p style="color:#94a3b8">在此输入内容后预览...</p>';
+                previewHtml.value = '<p style="color:#94a3b8">在此输入内容后预�?..</p>';
             }
         };
 
         const submitArticle = async () => {
             if (!form.value.title.trim() || !form.value.content.trim()) {
-                errorMsg.value = '标题和内容不能为空';
+                errorMsg.value = '标题和内容不能为�?;
                 return;
             }
             submitting.value = true;
@@ -199,7 +199,7 @@ createApp({
                 // Note: tags are stored but will need backend tag support to work fully
                 const res = await api.post('/api/article/publish', body);
                 if (res.code === 200) {
-                    showToast('发布成功！', 'success');
+                    showToast('发布成功�?, 'success');
                     setTimeout(() => { window.location.href = '/'; }, 800);
                 } else {
                     errorMsg.value = res.msg || '发布失败';
