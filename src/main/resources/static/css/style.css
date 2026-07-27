@@ -186,6 +186,7 @@ img {
   align-items: center;
   gap: 8px;
   list-style: none;
+  flex-shrink: 0;
 }
 
 .navbar-nav a {
@@ -1167,6 +1168,29 @@ select.form-input {
   .navbar .container {
     padding: 0 12px;
   }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .navbar-nav {
+    gap: 2px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .navbar-nav::-webkit-scrollbar { display: none; }
+  .navbar-nav a {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .navbar-nav .btn { padding: 5px 10px; font-size: 0.75rem; }
+  .navbar-nav .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+}
+@media (max-width: 420px) {
+  .navbar-brand { font-size: 0.9rem; }
+  .navbar-nav a { padding: 5px 5px; font-size: 0.7rem; }
+  .navbar-nav .btn { padding: 4px 7px; font-size: 0.68rem; }
 }
 
 /* ============================================
