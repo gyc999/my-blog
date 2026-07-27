@@ -70,7 +70,8 @@ public class AiService {
         try {
             long start = System.currentTimeMillis();
             String summary = switch (provider.toLowerCase()) {
-                case "openai" -> callOpenAI(prompt);
+                case "openai" -> callOpenAI(prompt, "https://api.openai.com/v1");
+                case "deepseek" -> callOpenAI(prompt, "https://api.deepseek.com/v1");
                 default -> callAnthropic(prompt);
             };
             long elapsed = System.currentTimeMillis() - start;
@@ -129,8 +130,8 @@ public class AiService {
     }
 
     @SuppressWarnings("unchecked")
-    private String callOpenAI(String prompt) {
-        String url = "https://api.openai.com/v1/chat/completions";
+    private String callOpenAI(String prompt, String baseUrl) {
+        String url = baseUrl + "/chat/completions";
         Map<String, Object> body = Map.of(
                 "model", model,
                 "max_tokens", maxSummaryChars + 50,

@@ -44,8 +44,8 @@ app:
   upload:
     path: uploads
   ai:
-    provider: ${AI_PROVIDER:anthropic}           # anthropic 或 openai
+    provider: ${AI_PROVIDER:deepseek}           # anthropic / openai / deepseek
     api-key: ${AI_API_KEY:}                      # API Key，Railway 环境变量注入
-    model: ${AI_MODEL:claude-haiku-4-5-20251001} # 默认 Haiku，便宜快
+    model: ${AI_MODEL:deepseek-chat}              # deepseek-chat / gpt-4o-mini / claude-haiku
     summary-max-chars: 150                        # 摘要最大字数
     enabled: ${AI_ENABLED:true}                   # 是否启用 AI 摘要
