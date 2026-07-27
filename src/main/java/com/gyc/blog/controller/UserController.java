@@ -6,10 +6,10 @@ import com.gyc.blog.common.Result;
 import com.gyc.blog.common.UserContext;
 import com.gyc.blog.entity.Article;
 import com.gyc.blog.entity.User;
+import com.gyc.blog.entity.dto.LoginRequest;
 import com.gyc.blog.entity.dto.RegisterRequest;
 import com.gyc.blog.entity.dto.UpdateProfileRequest;
 import com.gyc.blog.entity.vo.ArticleVO;
-import com.gyc.blog.mapper.UserMapper;
 import com.gyc.blog.service.ArticleService;
 import com.gyc.blog.service.LikeService;
 import com.gyc.blog.service.UserService;
@@ -54,9 +54,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Result<String> login(@RequestParam String username,
-                                @RequestParam String password) {
-        String token = userService.login(username, password);
+    public Result<String> login(@Valid @RequestBody LoginRequest req) {
+        String token = userService.login(req.getUsername(), req.getPassword());
         if (token == null) {
             return Result.error("用户名或密码错误");
         }

@@ -1,6 +1,7 @@
 package com.gyc.blog.config;
 
 import com.gyc.blog.common.JwtInterceptor;
+import com.gyc.blog.common.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -13,12 +14,18 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    private final JwtUtil jwtUtil;
+
     @Value("${app.upload.path:uploads}")
     private String uploadDir;
 
+    public WebConfig(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new JwtInterceptor())
+        registry.addInterceptor(new JwtInterceptor(jwtUtil))
                 .addPathPatterns("/api/**");
     }
 

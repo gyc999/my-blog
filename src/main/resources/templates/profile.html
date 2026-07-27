@@ -13,7 +13,7 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">✨ 我的博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li v-if="isLoggedIn"><a href="/user/profile" style="color:var(--color-primary);font-weight:600">👤 个人主页</a></li>
@@ -87,9 +87,6 @@
                 {{ tab.label }}
             </button>
         </div>
-
-        <!-- Tab: Profile Info (managed via header card above, active tab just shows info) -->
-        <div v-if="activeTab === 'profile' && false"></div>
 
         <!-- Tab: Liked Articles -->
         <div v-if="activeTab === 'likes'">
@@ -193,6 +190,11 @@
 </main>
 
 </div><!-- end #app -->
+
+<footer class="footer">
+    <div>✨ 郭源潮的个人博客</div>
+    <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
+</footer>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>

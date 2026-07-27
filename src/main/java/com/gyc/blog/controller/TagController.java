@@ -1,6 +1,7 @@
 package com.gyc.blog.controller;
 
 import com.gyc.blog.common.Result;
+import com.gyc.blog.common.UserContext;
 import com.gyc.blog.entity.Tag;
 import com.gyc.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,14 @@ public class TagController {
 
     @PostMapping
     public Result<String> add(@RequestBody Tag tag) {
+        if (UserContext.getUserId() == null) return Result.error("请先登录");
         return tagService.add(tag) ?
                 Result.success("添加成功") : Result.error("添加失败");
     }
 
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
+        if (UserContext.getUserId() == null) return Result.error("请先登录");
         return tagService.delete(id) ?
                 Result.success("删除成功") : Result.error("删除失败");
     }

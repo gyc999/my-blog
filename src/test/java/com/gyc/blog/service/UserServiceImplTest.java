@@ -1,6 +1,7 @@
 package com.gyc.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.gyc.blog.common.JwtUtil;
 import com.gyc.blog.entity.User;
 import com.gyc.blog.entity.vo.UserVO;
 import com.gyc.blog.mapper.UserMapper;
@@ -22,6 +23,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -79,6 +83,7 @@ class UserServiceImplTest {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         testUser.setPassword(encoder.encode("password123"));
         when(userMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
+        when(jwtUtil.generateToken(anyLong(), anyString())).thenReturn("mock-jwt-token");
 
         String token = userService.login("testuser", "password123");
 

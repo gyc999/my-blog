@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,12 @@ public class AiService {
     private boolean enabled;
 
     public AiService() {
-        this.restTemplate = new RestTemplate();
+        RestTemplate template = new RestTemplate();
+        template.setRequestFactory(new org.springframework.http.client.SimpleClientHttpRequestFactory() {{
+            setConnectTimeout(Duration.ofSeconds(10));
+            setReadTimeout(Duration.ofSeconds(30));
+        }});
+        this.restTemplate = template;
     }
 
     /**

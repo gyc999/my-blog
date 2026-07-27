@@ -5,18 +5,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-/**
- * JWT 认证拦截器 —— 柔性模式
- * 有 token 且合法 → 设置 UserContext
- * 无 token 或 token 无效 → 静默放行（由 Controller 自行判断是否需要登录）
- */
 public class JwtInterceptor implements HandlerInterceptor {
+
+    private final JwtUtil jwtUtil;
+
+    public JwtInterceptor(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("Authorization");
         if (token == null || token.isEmpty()) {
-            return true;  // 没带 token，放行
+            return true;
         }
 
         if (token.startsWith("Bearer ")) {
@@ -24,11 +25,11 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         try {
-            Claims claims = JwtUtil.parseToken(token);
+            Claims claims = jwtUtil.parseToken(token);
             Long userId = claims.get("userId", Long.class);
             UserContext.setUserId(userId);
-        } catch (Exception e) {
-            // token 无效或过期，静默忽略（Controller 自行判断）
+        } catch (Exception ignored) {
+            // token 无效或过期，静默忽略
         }
         return true;
     }

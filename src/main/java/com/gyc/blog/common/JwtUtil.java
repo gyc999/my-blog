@@ -3,39 +3,44 @@ package com.gyc.blog.common;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
-    // 密钥（32 位以上，建议放到配置文件中）
-    private static final String SECRET_STRING = "myBlogSecretKey1234567890123456789012";
-    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
-    private static final long EXPIRE = 86400000L; // 24小时
+    private final SecretKey secretKey;
+    private final long expire;
 
-    // 生成 Token
-    public static String generateToken(Long userId, String username) {
+    public JwtUtil(@Value("${app.jwt.secret:myBlogSecretKey1234567890123456789012}") String secret,
+                   @Value("${app.jwt.expire:86400000}") long expire) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expire = expire;
+    }
+
+    public String generateToken(Long userId, String username) {
         return Jwts.builder()
                 .subject(username)
                 .claim("userId", userId)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRE))
-                .signWith(SECRET_KEY)
+                .expiration(new Date(System.currentTimeMillis() + expire))
+                .signWith(secretKey)
                 .compact();
     }
 
-    // 解析 Token（使用 0.12.x 新 API）
-    public static Claims parseToken(String token) {
+    public Claims parseToken(String token) {
         return Jwts.parser()
-                .verifyWith(SECRET_KEY)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    // 从 Token 获取用户ID
-    public static Long getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         return parseToken(token).get("userId", Long.class);
     }
 }

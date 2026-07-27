@@ -25,7 +25,7 @@ public class LogAspect {
     private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
     private static final int MAX_ARG_LENGTH = 200;
 
-    @Pointcut("execution(* com.gyc.blog.controller..*(..))")
+    @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
     public void controllerLayer() {}
 
     @Around("controllerLayer()")

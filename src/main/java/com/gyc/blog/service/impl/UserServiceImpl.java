@@ -18,6 +18,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) return null;
 
         if (encoder.matches(password, user.getPassword())) {
-            return JwtUtil.generateToken(user.getId(), user.getUsername());
+            return jwtUtil.generateToken(user.getId(), user.getUsername());
         }
         return null;
     }

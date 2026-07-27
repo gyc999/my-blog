@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gyc.blog.entity.Article;
+import com.gyc.blog.entity.Category;
 import com.gyc.blog.entity.User;
 import com.gyc.blog.entity.vo.ArticleVO;
 import com.gyc.blog.mapper.ArticleMapper;
+import com.gyc.blog.mapper.CategoryMapper;
 import com.gyc.blog.mapper.UserMapper;
 import com.gyc.blog.service.AiService;
 import com.gyc.blog.service.ArticleService;
@@ -23,6 +25,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Autowired
     private AiService aiService;
@@ -61,6 +66,12 @@ public class ArticleServiceImpl implements ArticleService {
             User author = userMapper.selectById(article.getAuthorId());
             if (author != null) {
                 article.setAuthorName(author.getNickname());
+            }
+            if (article.getCategoryId() != null) {
+                Category category = categoryMapper.selectById(article.getCategoryId());
+                if (category != null) {
+                    article.setCategoryName(category.getName());
+                }
             }
         }
         return article;

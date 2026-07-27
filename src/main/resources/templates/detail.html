@@ -15,7 +15,7 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">✨ 我的博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li v-if="isLoggedIn"><a href="/user/profile">👤 个人主页</a></li>
@@ -43,7 +43,7 @@
                 <h1>{{ article.title }}</h1>
                 <div class="article-header-meta">
                     <span>✍️ {{ article.authorName || '匿名' }}</span>
-                    <span v-if="article.categoryId">📂 分类{{ article.categoryId }}</span>
+                    <span v-if="article.categoryName">📂 {{ article.categoryName }}</span>
                     <span>📅 {{ formatDate(article.createTime) }}</span>
                     <span>👁️ {{ viewCount }}</span>
                     <span>❤️ {{ likeCount }}</span>
@@ -186,6 +186,11 @@
 </main>
 
 <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
+
+<footer class="footer">
+    <div>✨ 郭源潮的个人博客</div>
+    <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
+</footer>
 
 <script>
 window.addEventListener('scroll', () => {

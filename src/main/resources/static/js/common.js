@@ -9,10 +9,14 @@ const api = {
   async request(url, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
-      'Content-Type': 'application/json',
       ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
       ...options.headers,
     };
+    // Only set Content-Type for methods with a body
+    const method = (options.method || 'GET').toUpperCase();
+    if (method !== 'GET' && method !== 'HEAD' && !(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     try {
       const res = await fetch(this.baseURL + url, { ...options, headers });

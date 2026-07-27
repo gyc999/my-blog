@@ -8,6 +8,8 @@ import com.gyc.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,8 +22,9 @@ public class CommentServiceImpl implements CommentService {
     public boolean publishComment(Comment comment, Long currentUserId) {
         comment.setUserId(currentUserId);
         if (comment.getParentId() == null) {
-            comment.setParentId(0L); // 默认顶级
+            comment.setParentId(0L);
         }
+        comment.setCreateTime(LocalDateTime.now());
         return commentMapper.insert(comment) > 0;
     }
 
