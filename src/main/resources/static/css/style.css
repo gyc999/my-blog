@@ -98,56 +98,12 @@ html {
   font-size: 16px;
 }
 
-/* ---- Animated Gradient Background ---- */
-@keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes blobFloat {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25%      { transform: translate(2%, -1%) scale(1.15); }
-  50%      { transform: translate(-1%, 2%) scale(0.95); }
-  75%      { transform: translate(1%, -2%) scale(1.1); }
-}
-
-/* Gradient on html — guaranteed visible */
-html {
-  background:
-    /* color orbs */
-    radial-gradient(ellipse 800px 600px at 20% 30%, rgba(99, 102, 241, 0.55) 0%, transparent 60%),
-    radial-gradient(ellipse 700px 550px at 80% 20%, rgba(236, 72, 153, 0.45) 0%, transparent 60%),
-    radial-gradient(ellipse 750px 500px at 75% 75%, rgba(139, 92, 246, 0.48) 0%, transparent 60%),
-    radial-gradient(ellipse 650px 600px at 15% 70%, rgba(16, 185, 129, 0.40) 0%, transparent 55%),
-    radial-gradient(ellipse 500px 450px at 50% 50%, rgba(59, 130, 246, 0.38) 0%, transparent 55%),
-    /* subtle moving gradient underneath */
-    linear-gradient(135deg, #eef2ff, #f0f9ff, #fdf2f8, #ecfdf5, #eef2ff);
-  background-size: 300% 300%;
-  animation: gradientShift 20s ease infinite, blobFloat 16s ease-in-out infinite alternate;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    background:
-      radial-gradient(ellipse 800px 600px at 20% 30%, rgba(99, 102, 241, 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 700px 550px at 80% 20%, rgba(236, 72, 153, 0.28) 0%, transparent 60%),
-      radial-gradient(ellipse 750px 500px at 75% 75%, rgba(139, 92, 246, 0.32) 0%, transparent 60%),
-      radial-gradient(ellipse 650px 600px at 15% 70%, rgba(16, 185, 129, 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse 500px 450px at 50% 50%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
-      linear-gradient(135deg, #0f172a, #1a1a2e, #16213e, #0f3460, #0f172a);
-  }
-}
-
 body {
   font-family: var(--font-sans);
   color: var(--text-primary);
-  background: transparent;
+  background: var(--bg-body);
   line-height: 1.7;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -190,10 +146,10 @@ img {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
   height: var(--navbar-height);
   display: flex;
   align-items: center;
@@ -201,16 +157,7 @@ img {
 
 @media (prefers-color-scheme: dark) {
   .navbar {
-    background: rgba(15, 23, 42, 0.75);
-  }
-  .card {
-    background: rgba(30, 41, 59, 0.75);
-  }
-  .sidebar-card {
-    background: rgba(30, 41, 59, 0.72);
-  }
-  .auth-card {
-    background: rgba(30, 41, 59, 0.78);
+    background: rgba(15, 23, 42, 0.85);
   }
 }
 
@@ -340,14 +287,12 @@ img {
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-card);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all var(--transition-slow);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 }
@@ -927,15 +872,13 @@ select.form-input {
 }
 
 .auth-card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--bg-card);
   border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 440px;
   padding: 40px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--border-color);
 }
 
 .auth-card h2 {
@@ -1147,10 +1090,8 @@ select.form-input {
 }
 
 .sidebar-card {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 20px;
   margin-bottom: 20px;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <script src="/js/common.js"></script>
 </head>
 <body class="auth-page">
@@ -14,8 +14,8 @@
 
     <form id="loginForm" @submit.prevent="handleLogin">
         <div class="form-group">
-            <label class="form-label" for="username">用户�?/label>
-            <input type="text" id="username" class="form-input" v-model="username" placeholder="输入用户�? required autocomplete="username">
+            <label class="form-label" for="username">用户名</label>
+            <input type="text" id="username" class="form-input" v-model="username" placeholder="输入用户名" required autocomplete="username">
         </div>
         <div class="form-group">
             <label class="form-label" for="password">密码</label>
@@ -23,15 +23,15 @@
         </div>
         <div v-if="errorMsg" class="mb-2" style="color:var(--color-error);font-size:0.85rem;text-align:center">{{ errorMsg }}</div>
         <button type="submit" class="btn btn-primary btn-block" :disabled="submitting">
-            {{ submitting ? '登录�?..' : '登录' }}
+            {{ submitting ? '登录中...' : '登录' }}
         </button>
     </form>
 
     <div class="auth-footer">
-        <a href="/register">还没有账号？立即注册 �?/a>
+        <a href="/register">还没有账号？立即注册 →</a>
     </div>
     <div class="auth-footer mt-1">
-        <a href="/" style="color:var(--text-muted);font-size:0.85rem">�?返回首页</a>
+        <a href="/" style="color:var(--text-muted);font-size:0.85rem">← 返回首页</a>
         <a href="/user/profile" style="color:var(--text-muted);font-size:0.85rem;margin-left:14px">👤 个人主页</a>
     </div>
 </div>
@@ -52,7 +52,7 @@ createApp({
 
         const handleLogin = async () => {
             if (!username.value.trim() || !password.value.trim()) {
-                errorMsg.value = '请输入用户名和密�?;
+                errorMsg.value = '请输入用户名和密码';
                 return;
             }
             submitting.value = true;
@@ -61,7 +61,7 @@ createApp({
                 const res = await api.post('/api/user/login', { username: username.value, password: password.value });
                 if (res.code === 200) {
                     localStorage.setItem('token', res.data);
-                    showToast('登录成功�?, 'success');
+                    showToast('登录成功！', 'success');
                     setTimeout(() => { window.location.href = '/'; }, 500);
                 } else {
                     errorMsg.value = res.msg || '用户名或密码错误';

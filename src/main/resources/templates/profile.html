@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人主页 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <script src="/js/common.js"></script>
 </head>
 <body>
@@ -13,13 +13,13 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">�?郭源潮的个人博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li v-if="isLoggedIn"><a href="/user/profile" style="color:var(--color-primary);font-weight:600">👤 个人主页</a></li>
             <li v-if="!isLoggedIn"><a href="/login">登录</a></li>
-            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文�?/a></li>
-            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退�?/button></li>
+            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退出</button></li>
         </ul>
     </div>
 </nav>
@@ -44,9 +44,9 @@
             </div>
             <div style="flex:1;min-width:250px">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-                    <div><label class="text-muted text-sm">昵称</label><div style="font-weight:500">{{ userInfo.nickname || '未设�? }}</div></div>
-                    <div><label class="text-muted text-sm">用户�?/label><div style="font-weight:500">@{{ userInfo.username }}</div></div>
-                    <div><label class="text-muted text-sm">角色</label><div style="font-weight:500">{{ userInfo.role === 1 ? '管理�? : '普通用�? }}</div></div>
+                    <div><label class="text-muted text-sm">昵称</label><div style="font-weight:500">{{ userInfo.nickname || '未设置' }}</div></div>
+                    <div><label class="text-muted text-sm">用户名</label><div style="font-weight:500">@{{ userInfo.username }}</div></div>
+                    <div><label class="text-muted text-sm">角色</label><div style="font-weight:500">{{ userInfo.role === 1 ? '管理员' : '普通用户' }}</div></div>
                     <div><label class="text-muted text-sm">注册时间</label><div style="font-weight:500">{{ formatDate(userInfo.createTime) }}</div></div>
                 </div>
                 <button v-if="!editing" class="btn btn-outline" @click="startEdit" style="margin-top:20px">✏️ 编辑资料</button>
@@ -62,11 +62,11 @@
                         <input type="text" class="form-input" v-model="editForm.avatar" placeholder="输入头像图片链接">
                     </div>
                     <div v-if="editForm.avatar" style="margin-bottom:12px">
-                        <span class="text-muted text-sm">预览�?/span>
+                        <span class="text-muted text-sm">预览：</span>
                         <img :src="editForm.avatar" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border-color);vertical-align:middle" @error="editForm.avatar=''">
                     </div>
                     <div style="display:flex;gap:8px">
-                        <button class="btn btn-primary btn-sm" @click="saveProfile" :disabled="saving">{{ saving ? '保存�?..' : '💾 保存' }}</button>
+                        <button class="btn btn-primary btn-sm" @click="saveProfile" :disabled="saving">{{ saving ? '保存中...' : '💾 保存' }}</button>
                         <button class="btn btn-secondary btn-sm" @click="cancelEdit">取消</button>
                     </div>
                     <div v-if="editMsg" :style="{color: editSuccess ? 'var(--color-success)' : 'var(--color-error)', marginTop:'8px', fontSize:'0.9rem'}">{{ editMsg }}</div>
@@ -97,7 +97,7 @@
                 <div class="empty-icon">💔</div>
                 <h3>还没有赞过的文章</h3>
                 <p class="text-muted">去首页发现感兴趣的文章吧</p>
-                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看�?/a>
+                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看看</a>
             </div>
             <div v-else class="card-grid">
                 <div class="card" v-for="a in likedArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
@@ -127,7 +127,7 @@
                 <div class="empty-icon">📑</div>
                 <h3>还没有收藏的文章</h3>
                 <p class="text-muted">遇到好文章记得收藏哦</p>
-                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看�?/a>
+                <a href="/" class="btn btn-primary btn-sm" style="margin-top:12px">去首页看看</a>
             </div>
             <div v-else class="card-grid">
                 <div class="card" v-for="a in collectedArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
@@ -141,7 +141,7 @@
                         <div class="card-meta">
                             <span>✍️ {{ a.authorName || '匿名' }}</span>
                             <span>📅 {{ formatDate(a.createTime) }}</span>
-                            <span>�?{{ a.collectCount || 0 }}</span>
+                            <span>⭐ {{ a.collectCount || 0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -155,9 +155,9 @@
             </div>
             <div v-else-if="myArticles.length === 0" class="empty-state">
                 <div class="empty-icon">📝</div>
-                <h3>还没有发布文�?/h3>
+                <h3>还没有发布文章</h3>
                 <p class="text-muted">开始写你的第一篇文章吧</p>
-                <a href="/article/publish" class="btn btn-primary btn-sm" style="margin-top:12px">✏️ 写文�?/a>
+                <a href="/article/publish" class="btn btn-primary btn-sm" style="margin-top:12px">✏️ 写文章</a>
             </div>
             <div v-else class="card-grid">
                 <div class="card" v-for="a in myArticles" :key="a.id" @click="goDetail(a.id)" style="cursor:pointer">
@@ -170,7 +170,7 @@
                         <p class="card-summary">{{ a.summary || '暂无摘要' }}</p>
                         <div class="card-meta">
                             <span>📅 {{ formatDate(a.createTime) }}</span>
-                            <span>👁�?{{ a.viewCount || 0 }}</span>
+                            <span>👁️ {{ a.viewCount || 0 }}</span>
                             <span>❤️ {{ a.likeCount || 0 }}</span>
                             <span>💬 {{ a.commentCount || 0 }}</span>
                         </div>
@@ -184,15 +184,15 @@
     <div v-if="!loading && !isLoggedIn" class="empty-state">
         <div class="empty-icon">🔒</div>
         <h3>请先登录</h3>
-        <p class="text-muted">登录后即可查看个人主�?/p>
-        <a href="/login" class="btn btn-primary" style="margin-top:16px">去登�?/a>
+        <p class="text-muted">登录后即可查看个人主页</p>
+        <a href="/login" class="btn btn-primary" style="margin-top:16px">去登录</a>
     </div>
 </main>
 
 </div><!-- end #app -->
 
 <footer class="footer">
-    <div>�?郭源潮的个人博客</div>
+    <div>✨ 郭源潮的个人博客</div>
     <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
 </footer>
 
@@ -221,8 +221,8 @@ createApp({
         const tabs = [
             { key: 'profile', label: '📋 个人信息' },
             { key: 'articles', label: '📝 我的文章' },
-            { key: 'likes', label: '❤️ 赞过的文�? },
-            { key: 'collects', label: '�?收藏的文�? }
+            { key: 'likes', label: '❤️ 赞过的文章' },
+            { key: 'collects', label: '⭐ 收藏的文章' }
         ];
 
         const loadUserInfo = async () => {
@@ -254,7 +254,7 @@ createApp({
                 });
                 if (res.code === 200) {
                     editSuccess.value = true;
-                    editMsg.value = '更新成功�?;
+                    editMsg.value = '更新成功！';
                     await loadUserInfo();
                     setTimeout(() => { editing.value = false; editMsg.value = ''; }, 1500);
                 } else {
@@ -275,7 +275,7 @@ createApp({
                 const res = await api.get('/api/user/likes');
                 if (res.code === 200) likedArticles.value = res.data || [];
                 else showToast('加载赞过文章失败: ' + (res.msg || ''), 'error');
-            } catch { showToast('网络错误，加载赞过文章失�?, 'error'); } finally {
+            } catch { showToast('网络错误，加载赞过文章失败', 'error'); } finally {
                 likedLoading.value = false;
             }
         };
@@ -286,7 +286,7 @@ createApp({
                 const res = await api.get('/api/user/collects');
                 if (res.code === 200) collectedArticles.value = res.data || [];
                 else showToast('加载收藏文章失败: ' + (res.msg || ''), 'error');
-            } catch { showToast('网络错误，加载收藏文章失�?, 'error'); } finally {
+            } catch { showToast('网络错误，加载收藏文章失败', 'error'); } finally {
                 collectedLoading.value = false;
             }
         };
@@ -297,7 +297,7 @@ createApp({
                 const res = await api.get('/api/user/articles?size=50');
                 if (res.code === 200 && res.data) myArticles.value = res.data.records || [];
                 else showToast('加载我的文章失败: ' + (res.msg || ''), 'error');
-            } catch { showToast('网络错误，加载我的文章失�?, 'error'); } finally {
+            } catch { showToast('网络错误，加载我的文章失败', 'error'); } finally {
                 myArticlesLoading.value = false;
             }
         };

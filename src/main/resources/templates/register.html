@@ -4,40 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>注册 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <script src="/js/common.js"></script>
 </head>
 <body class="auth-page">
 <div class="auth-card">
     <h2>🎉 创建账号</h2>
-    <p class="auth-subtitle">加入我们，开始记录生�?/p>
+    <p class="auth-subtitle">加入我们，开始记录生活</p>
 
     <form @submit.prevent="handleRegister">
         <div class="form-group">
-            <label class="form-label" for="username">用户�?/label>
-            <input type="text" id="username" class="form-input" v-model="username" placeholder="用户�? required autocomplete="username" minlength="3" maxlength="20">
+            <label class="form-label" for="username">用户名</label>
+            <input type="text" id="username" class="form-input" v-model="username" placeholder="用户名" required autocomplete="username" minlength="3" maxlength="20">
         </div>
         <div class="form-group">
             <label class="form-label" for="password">密码</label>
-            <input type="password" id="password" class="form-input" v-model="password" placeholder="至少6位密�? required autocomplete="new-password" minlength="6" @input="checkPasswordStrength">
+            <input type="password" id="password" class="form-input" v-model="password" placeholder="至少6位密码" required autocomplete="new-password" minlength="6" @input="checkPasswordStrength">
             <div class="password-strength" :class="passwordStrength" v-if="password"></div>
         </div>
         <div class="form-group">
-            <label class="form-label" for="nickname">昵称 <span class="text-muted">(可�?</span></label>
+            <label class="form-label" for="nickname">昵称 <span class="text-muted">(可选)</span></label>
             <input type="text" id="nickname" class="form-input" v-model="nickname" placeholder="如何称呼你？" maxlength="20">
         </div>
         <div v-if="errorMsg" class="mb-2" style="color:var(--color-error);font-size:0.85rem;text-align:center">{{ errorMsg }}</div>
         <div v-if="successMsg" class="mb-2" style="color:var(--color-success);font-size:0.85rem;text-align:center">{{ successMsg }}</div>
         <button type="submit" class="btn btn-primary btn-block" :disabled="submitting">
-            {{ submitting ? '注册�?..' : '注册' }}
+            {{ submitting ? '注册中...' : '注册' }}
         </button>
     </form>
 
     <div class="auth-footer">
-        <a href="/login">已有账号？立即登�?�?/a>
+        <a href="/login">已有账号？立即登录 →</a>
     </div>
     <div class="auth-footer mt-1">
-        <a href="/" style="color:var(--text-muted);font-size:0.85rem">�?返回首页</a>
+        <a href="/" style="color:var(--text-muted);font-size:0.85rem">← 返回首页</a>
         <a href="/user/profile" style="color:var(--text-muted);font-size:0.85rem;margin-left:14px">👤 个人主页</a>
     </div>
 </div>
@@ -74,7 +74,7 @@ createApp({
                 return;
             }
             if (password.value.length < 6) {
-                errorMsg.value = '密码至少需�?�?;
+                errorMsg.value = '密码至少需要6位';
                 return;
             }
             submitting.value = true;
@@ -87,8 +87,8 @@ createApp({
                     nickname: nickname.value.trim() || username.value.trim()
                 });
                 if (res.code === 200) {
-                    successMsg.value = '注册成功！即将跳�?..';
-                    showToast('注册成功�?, 'success');
+                    successMsg.value = '注册成功！即将跳转...';
+                    showToast('注册成功！', 'success');
                     setTimeout(() => { window.location.href = '/login'; }, 1000);
                 } else {
                     errorMsg.value = res.msg || '注册失败';

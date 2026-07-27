@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑文章 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="/js/common.js"></script>
 </head>
 <body>
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">�?郭源潮的个人博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li><a href="/user/profile">👤 个人主页</a></li>
-            <li><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文�?/a></li>
-            <li><button class="btn btn-ghost btn-sm" onclick="userState.logout()">退�?/button></li>
+            <li><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li><button class="btn btn-ghost btn-sm" onclick="userState.logout()">退出</button></li>
         </ul>
     </div>
 </nav>
@@ -34,7 +34,7 @@
         <form @submit.prevent="submitEdit">
             <!-- Cover Upload -->
             <div class="form-group">
-                <label class="form-label">封面图片 <span class="text-muted">(可�?</span></label>
+                <label class="form-label">封面图片 <span class="text-muted">(可选)</span></label>
                 <div class="upload-area" @click="$refs.fileInput.click()" @dragover.prevent @dragenter="dragOver=true" @dragleave="dragOver=false" @drop.prevent="handleDrop" :class="{'drag-over': dragOver}">
                     <div v-if="!coverPreview && !form.coverImage">
                         <div class="upload-icon">📷</div>
@@ -65,9 +65,9 @@
                     </select>
                 </div>
                 <div class="form-group" style="flex:1;min-width:200px">
-                    <label class="form-label" for="status">状�?/label>
+                    <label class="form-label" for="status">状态</label>
                     <select id="status" class="form-input" v-model="form.status">
-                        <option :value="1">📢 已发�?/option>
+                        <option :value="1">📢 已发布</option>
                         <option :value="0">📝 草稿</option>
                     </select>
                 </div>
@@ -94,7 +94,7 @@
             <div v-if="errorMsg" class="mb-2" style="color:var(--color-error)">{{ errorMsg }}</div>
             <div style="display:flex;gap:12px">
                 <button type="submit" class="btn btn-primary btn-lg" :disabled="submitting">
-                    {{ submitting ? '保存�?..' : '💾 保存修改' }}
+                    {{ submitting ? '保存中...' : '💾 保存修改' }}
                 </button>
                 <a :href="'/article/detail/' + articleId" class="btn btn-secondary btn-lg">取消</a>
             </div>
@@ -103,7 +103,7 @@
 </main>
 
 <footer class="footer">
-    <div>�?郭源潮的个人博客</div>
+    <div>✨ 郭源潮的个人博客</div>
     <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
 </footer>
 
@@ -195,7 +195,7 @@ createApp({
                 const data = await res.json();
                 if (data.code === 200) return data.data.url;
                 else { showToast('封面上传失败: ' + (data.msg || '未知错误'), 'error'); return null; }
-            } catch (e) { showToast('封面上传失败，请检查网�?, 'error'); return null; }
+            } catch (e) { showToast('封面上传失败，请检查网络', 'error'); return null; }
         };
 
         const updatePreview = () => {
@@ -204,7 +204,7 @@ createApp({
 
         const submitEdit = async () => {
             if (!form.value.title.trim() || !form.value.content.trim()) {
-                errorMsg.value = '标题和内容不能为�?;
+                errorMsg.value = '标题和内容不能为空';
                 return;
             }
             submitting.value = true;
@@ -225,7 +225,7 @@ createApp({
                 };
                 const res = await api.put(`/api/article/${articleId}`, body);
                 if (res.code === 200) {
-                    showToast('保存成功�?, 'success');
+                    showToast('保存成功！', 'success');
                 } else {
                     errorMsg.value = res.msg || '保存失败';
                 }

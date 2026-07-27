@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <script src="/js/common.js"></script>
 </head>
 <body>
@@ -15,7 +15,7 @@
 <!-- Navigation -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">�?郭源潮的个人博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li v-if="!isLoggedIn"><a href="/login" class="btn btn-outline btn-sm">登录</a></li>
@@ -28,18 +28,18 @@
                     👤 {{ userInfo?.nickname || userInfo?.username || '用户' }}
                 </span>
             </li>
-            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文�?/a></li>
-            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退�?/button></li>
+            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退出</button></li>
         </ul>
     </div>
 </nav>
 
 <!-- Hero Section -->
 <section class="hero">
-    <h1>📝 探索知识与生�?/h1>
-    <p>分享技术心得、生活感悟，用文字记录每一个值得铭记的瞬�?/p>
+    <h1>📝 探索知识与生活</h1>
+    <p>分享技术心得、生活感悟，用文字记录每一个值得铭记的瞬间</p>
     <div class="hero-actions" v-if="isLoggedIn">
-        <a href="/article/publish" class="btn btn-lg" style="background:rgba(255,255,255,0.2);color:white;border:1.5px solid rgba(255,255,255,0.3)">开始写�?✍️</a>
+        <a href="/article/publish" class="btn btn-lg" style="background:rgba(255,255,255,0.2);color:white;border:1.5px solid rgba(255,255,255,0.3)">开始写作 ✍️</a>
     </div>
 </section>
 
@@ -75,10 +75,10 @@
                 </div>
                 <div class="card-meta">
                     <span>✍️ {{ a.authorName || '匿名' }}</span>
-                    <span>📂 {{ a.categoryName || '未分�? }}</span>
+                    <span>📂 {{ a.categoryName || '未分类' }}</span>
                     <span>❤️ {{ a.likeCount || 0 }}</span>
-                    <span>�?{{ a.collectCount || 0 }}</span>
-                    <span>👁�?{{ a.viewCount || 0 }}</span>
+                    <span>⭐ {{ a.collectCount || 0 }}</span>
+                    <span>👁️ {{ a.viewCount || 0 }}</span>
                     <span>📅 {{ formatDate(a.createTime) }}</span>
                 </div>
                 <div class="card-actions" v-if="isLoggedIn">
@@ -87,8 +87,8 @@
                         <span v-else>🤍</span> {{ a.likeCount || 0 }}
                     </button>
                     <button class="btn btn-ghost btn-sm btn-collect" :class="{collected: collectedSet.has(a.id)}" @click.stop="toggleCollect(a)">
-                        <span v-if="collectedSet.has(a.id)">�?/span>
-                        <span v-else>�?/span> {{ a.collectCount || 0 }}
+                        <span v-if="collectedSet.has(a.id)">⭐</span>
+                        <span v-else>☆</span> {{ a.collectCount || 0 }}
                     </button>
                 </div>
             </div>
@@ -110,7 +110,7 @@
     <!-- Empty State -->
     <div class="empty-state" v-if="!loading && articles.length === 0">
         <div class="empty-icon">📭</div>
-        <h3>还没有文�?/h3>
+        <h3>还没有文章</h3>
         <p class="text-muted" v-if="isLoggedIn">
             <a href="/article/publish">写一篇吧 ✍️</a>
         </p>
@@ -125,11 +125,11 @@
 </main>
 
 <!-- Back to Top -->
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">�?/button>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
 
 <!-- Footer -->
 <footer class="footer">
-    <div>�?郭源潮的个人博客</div>
+    <div>✨ 郭源潮的个人博客</div>
     <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
 </footer>
 
@@ -208,7 +208,7 @@ createApp({
                     currentPage.value = res.data.current || 1;
                 }
             } catch (err) {
-                showToast('加载失败，请检查服务是否启�?, 'error');
+                showToast('加载失败，请检查服务是否启动', 'error');
             } finally {
                 loading.value = false;
             }
@@ -297,7 +297,8 @@ createApp({
         onMounted(async () => {
             loadCategories();
             loadTags();
-            // 加载用户完整信息用于导航栏显�?            if (isLoggedIn.value) {
+            // 加载用户完整信息用于导航栏显示
+            if (isLoggedIn.value) {
                 userState.fetchAndCacheUserInfo().then(info => {
                     if (info) userInfo.value = info;
                 });

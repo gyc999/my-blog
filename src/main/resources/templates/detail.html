@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">文章详情 - 个人博客</title>
-    <link rel="stylesheet" href="/css/style.css?v=3">
+    <link rel="stylesheet" href="/css/style.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="/js/common.js"></script>
 </head>
@@ -15,13 +15,13 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">�?郭源潮的个人博客</a>
+        <a href="/" class="navbar-brand">✨ 郭源潮的个人博客</a>
         <ul class="navbar-nav">
             <li><a href="/">首页</a></li>
             <li v-if="isLoggedIn"><a href="/user/profile">👤 个人主页</a></li>
             <li v-if="!isLoggedIn"><a href="/login">登录</a></li>
-            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文�?/a></li>
-            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退�?/button></li>
+            <li v-if="isLoggedIn"><a href="/article/publish" class="btn btn-primary btn-sm">✏️ 写文章</a></li>
+            <li v-if="isLoggedIn"><button class="btn btn-ghost btn-sm" @click="logout">退出</button></li>
         </ul>
     </div>
 </nav>
@@ -45,9 +45,9 @@
                     <span>✍️ {{ article.authorName || '匿名' }}</span>
                     <span v-if="article.categoryName">📂 {{ article.categoryName }}</span>
                     <span>📅 {{ formatDate(article.createTime) }}</span>
-                    <span>👁�?{{ viewCount }}</span>
+                    <span>👁️ {{ viewCount }}</span>
                     <span>❤️ {{ likeCount }}</span>
-                    <span>�?{{ collectCount }}</span>
+                    <span>⭐ {{ collectCount }}</span>
                 </div>
             </header>
 
@@ -68,7 +68,7 @@
                     <span v-if="isLiked">❤️</span><span v-else>🤍</span> {{ likeCount }}
                 </button>
                 <button class="btn btn-ghost btn-collect" :class="{collected: isCollected}" @click="toggleCollect" :disabled="!isLoggedIn" style="font-size:1.1rem">
-                    <span v-if="isCollected">�?/span><span v-else>�?/span> {{ collectCount }}
+                    <span v-if="isCollected">⭐</span><span v-else>☆</span> {{ collectCount }}
                 </button>
                 <div style="flex:1"></div>
                 <a :href="'/article/edit/' + article.id" class="btn btn-outline btn-sm" v-if="isOwner">编辑</a>
@@ -84,12 +84,13 @@
                     <textarea class="form-input" v-model="newComment" rows="3" placeholder="写下你的想法..." :disabled="commentSubmitting"></textarea>
                     <div style="display:flex;justify-content:flex-end;margin-top:8px">
                         <button class="btn btn-primary btn-sm" @click="publishComment(null)" :disabled="commentSubmitting || !newComment.trim()">
-                            {{ commentSubmitting ? '发表�?..' : '发表评论' }}
+                            {{ commentSubmitting ? '发表中...' : '发表评论' }}
                         </button>
                     </div>
                 </div>
                 <div v-else style="text-align:center;padding:20px;color:var(--text-muted)">
-                    <a href="/login">登录</a> 后参与评�?                </div>
+                    <a href="/login">登录</a> 后参与评论
+                </div>
 
                 <!-- Comment List -->
                 <div v-if="comments.length > 0">
@@ -142,7 +143,7 @@
         <!-- Not Found -->
         <div class="empty-state" v-if="!loading && !article">
             <div class="empty-icon">🔍</div>
-            <h3>文章不存�?/h3>
+            <h3>文章不存在</h3>
             <a href="/">返回首页</a>
         </div>
     </div>
@@ -150,7 +151,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" v-if="!loading && article">
         <div class="sidebar-card">
-            <h3>关于作�?/h3>
+            <h3>关于作者</h3>
             <div style="text-align:center">
                 <div class="comment-avatar" style="width:60px;height:60px;font-size:1.4rem;margin:0 auto 10px">👤</div>
                 <div style="font-weight:600;margin-bottom:4px">{{ article.authorName || '匿名' }}</div>
@@ -161,10 +162,10 @@
         <div class="sidebar-card">
             <h3>文章信息</h3>
             <div style="display:flex;flex-direction:column;gap:8px;font-size:0.9rem;color:var(--text-secondary)">
-                <span>👁�?浏览 {{ viewCount }} �?/span>
+                <span>👁️ 浏览 {{ viewCount }} 次</span>
                 <span>❤️ {{ likeCount }} 个赞</span>
-                <span>�?{{ collectCount }} 个收�?/span>
-                <span>💬 {{ comments.length }} 条评�?/span>
+                <span>⭐ {{ collectCount }} 个收藏</span>
+                <span>💬 {{ comments.length }} 条评论</span>
                 <span>📅 {{ article?.createTime?.substring(0,10) }}</span>
             </div>
         </div>
@@ -173,21 +174,21 @@
             <h3>操作</h3>
             <div style="display:flex;flex-direction:column;gap:8px">
                 <button class="btn btn-outline btn-sm btn-block" :class="{liked: isLiked}" @click="toggleLike" :disabled="!isLoggedIn">
-                    {{ isLiked ? '❤️ 已点�? : '🤍 点赞' }}
+                    {{ isLiked ? '❤️ 已点赞' : '🤍 点赞' }}
                 </button>
                 <button class="btn btn-outline btn-sm btn-block" :class="{collected: isCollected}" @click="toggleCollect" :disabled="!isLoggedIn">
-                    {{ isCollected ? '�?已收�? : '�?收藏' }}
+                    {{ isCollected ? '⭐ 已收藏' : '☆ 收藏' }}
                 </button>
-                <a href="/" class="btn btn-secondary btn-sm btn-block">�?返回首页</a>
+                <a href="/" class="btn btn-secondary btn-sm btn-block">← 返回首页</a>
             </div>
         </div>
     </aside>
 </main>
 
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">�?/button>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
 
 <footer class="footer">
-    <div>�?郭源潮的个人博客</div>
+    <div>✨ 郭源潮的个人博客</div>
     <div class="footer-tech">Spring Boot 3 &middot; MyBatis-Plus &middot; Redis &middot; Vue 3 &middot; Docker</div>
 </footer>
 
@@ -325,7 +326,7 @@ createApp({
         };
 
         const delComment = async (commentId) => {
-            if (!confirm('确定删除这条评论吗？子评论也会被删除�?)) return;
+            if (!confirm('确定删除这条评论吗？子评论也会被删除。')) return;
             try {
                 const res = await api.delete(`/api/comment/${commentId}`);
                 if (res.code === 200) {
@@ -338,7 +339,7 @@ createApp({
         };
 
         const deleteArticle = async () => {
-            if (!confirm('确定删除这篇文章吗？此操作不可撤销�?)) return;
+            if (!confirm('确定删除这篇文章吗？此操作不可撤销。')) return;
             try {
                 const res = await api.delete(`/api/article/${articleId}`);
                 if (res.code === 200) {
